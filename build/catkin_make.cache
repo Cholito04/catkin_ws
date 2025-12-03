@@ -1,0 +1,2 @@
+Lanelet2/lanelet2:Lanelet2/lanelet2_core:Lanelet2/lanelet2_examples:Lanelet2/lanelet2_interface_ros:Lanelet2/lanelet2_io:Lanelet2/lanelet2_maps:Lanelet2/lanelet2_matching:Lanelet2/lanelet2_projection:Lanelet2/lanelet2_python:Lanelet2/lanelet2_routing:Lanelet2/lanelet2_traffic_rules:Lanelet2/lanelet2_validation:lanelet_map_viz:map_tf_publisher
+-DCATKIN_DEVEL_PREFIX=/home/cholito/catkin_ws/devel -DCMAKE_INSTALL_PREFIX=/home/cholito/catkin_ws/install -G Unix Makefiles

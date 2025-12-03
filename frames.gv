@@ -1,0 +1,7 @@
+digraph G {
+"map" -> "actual_utm_no_offset"[label="Broadcaster: /map_frame_to_utm_tf_publisher\nAverage rate: 1.250 Hz\nMost recent transform: 1764768596.936 ( 0.807 sec old)\nBuffer length: 4.000 sec\n"];
+edge [style=invis];
+ subgraph cluster_legend { style=bold; color=black; label ="view_frames Result";
+"Recorded at time: 1764768597.742"[ shape=plaintext ] ;
+ }->"map";
+}

@@ -1,0 +1,8 @@
+prefix=/home/cholito/catkin_ws/devel
+
+Name: campus_shuttle_mapping
+Description: Description of campus_shuttle_mapping
+Version: 0.0.0
+Cflags: 
+Libs: -L${prefix}/lib 
+Requires: 

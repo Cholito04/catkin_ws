@@ -1,0 +1,8 @@
+prefix=/home/cholito/catkin_ws/install
+
+Name: lanelet_map_viz
+Description: Description of lanelet_map_viz
+Version: 0.0.0
+Cflags: 
+Libs: -L${prefix}/lib 
+Requires: 
