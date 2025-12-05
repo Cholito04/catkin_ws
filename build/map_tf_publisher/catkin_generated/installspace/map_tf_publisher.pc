@@ -1,0 +1,8 @@
+prefix=/home/cholito/catkin_ws/install
+
+Name: map_tf_publisher
+Description: Description of map_tf_publisher
+Version: 0.0.0
+Cflags: 
+Libs: -L${prefix}/lib 
+Requires: 

@@ -1,0 +1,31 @@
+<launch>
+  <arg name="map_file" default="$(find lanelet_map_viz)/maps/mapOfCampus.osm"/>
+  <arg name="frame_id" default="map"/>
+
+  <!-- Include your map-to-UTM TF node -->
+<include file="$(find map_tf_publisher)/launch/map_to_utm_tf.launch">
+    <arg name="lat_origin" value="41.5489"/>
+    <arg name="lon_origin" value="-85.7965"/>
+    <arg name="map_frame" value="$(arg frame_id)"/>
+    <arg name="utm_frame" value="actual_utm_no_offset"/>
+</include>
+
+  <!-- Python visualizer -->
+  <node pkg="lanelet_map_viz"
+        type="lanelet_map_viz.py"
+        name="lanelet_map_viz"
+        output="screen">
+    <param name="frame_id" value="$(arg frame_id)"/>
+    <param name="map_file" value="$(arg map_file)"/>
+  </node>
+
+  <!-- RViz -->
+  <node pkg="rviz"
+        type="rviz"
+        name="rviz"
+        args="-f $(arg frame_id)"
+        output="screen"/>
+</launch>
+
+
+

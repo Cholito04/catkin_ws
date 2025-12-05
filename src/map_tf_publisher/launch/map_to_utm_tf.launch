@@ -1,0 +1,18 @@
+<launch>
+  <arg name="lat_origin" default="41.5489"/>
+  <arg name="lon_origin" default="-85.7965"/>
+  <arg name="map_frame" default="map"/>
+  <arg name="utm_frame" default="actual_utm_no_offset"/>
+
+  <node pkg="map_tf_publisher"
+        type="map_to_utm_tf.py"
+        name="map_to_utm_tf_publisher"
+        output="screen">
+    <param name="lat_origin" value="$(arg lat_origin)"/>
+    <param name="lon_origin" value="$(arg lon_origin)"/>
+    <param name="map_frame" value="$(arg map_frame)"/>
+    <param name="utm_frame" value="$(arg utm_frame)"/>
+  </node>
+</launch>
+
+
