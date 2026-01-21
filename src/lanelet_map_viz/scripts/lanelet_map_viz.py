@@ -9,7 +9,7 @@ import lanelet2
 from lanelet2.projection import UtmProjector
 
 
-#  CLASS 1: onverts Lanelet2 geometry → ROS Points
+#  CLASS 1: converts Lanelet2 geometry to ROS Points
 class LaneletConverter:
     # Utility class to convert lanelet geometry into ROS Point messages.
 
@@ -110,7 +110,8 @@ class LaneletVisualizerNode:
         self.pub = rospy.Publisher(
             "/lanelet_markers",
             MarkerArray,
-            queue_size=10
+            queue_size=10,
+            latch=True
         )
 
         self._validate_map_path()
@@ -127,7 +128,7 @@ class LaneletVisualizerNode:
             raise FileNotFoundError(self.map_file)
 
     def _load_map(self):
-        origin = lanelet2.io.Origin(41.5489, -85.7965)
+        origin = lanelet2.io.Origin(42.28449400001, -85.6186400996)
         projector = UtmProjector(origin)
 
         rospy.loginfo(f"[LaneletVisualizer] Loading map: {self.map_file}")
@@ -138,30 +139,30 @@ class LaneletVisualizerNode:
 
     # Main loop
     def run(self):
-        rate = rospy.Rate(1)
+        markers = MarkerArray()
         marker_id = 0
 
-        while not rospy.is_shutdown():
-            markers = MarkerArray()
-            marker_id = 0  # Reset every cycle for stable marker IDs
+        for lanelet in self.llmap.laneletLayer:
+            left = self.converter.to_ros_points(lanelet.leftBound)
+            right = self.converter.to_ros_points(lanelet.rightBound)
+            center = self.converter.to_ros_points(lanelet.centerline)
 
-            for lanelet in self.llmap.laneletLayer:
+            if not center:
+                continue
 
-                left = self.converter.to_ros_points(lanelet.leftBound)
-                right = self.converter.to_ros_points(lanelet.rightBound)
-                center = self.converter.to_ros_points(lanelet.centerline)
+            block, marker_id = self.factory.lanelet_markers(
+                marker_id, left, right, center
+            )
 
-                if not center:
-                    continue
+            markers.markers.extend(block)
 
-                block, marker_id = self.factory.lanelet_markers(
-                    marker_id, left, right, center
-                )
+        rospy.loginfo(
+            f"[LaneletVisualizer] Publishing {len(markers.markers)} static markers"
+        )
+        self.pub.publish(markers)
 
-                markers.markers.extend(block)
+        rospy.spin()  # Node stays alive, no republishing
 
-            self.pub.publish(markers)
-            rate.sleep()
 
 
 #  MAIN

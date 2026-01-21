@@ -14,8 +14,8 @@ class MapToUTMNode:
         # -----------------------
         # Load parameters
         # -----------------------
-        self.lat_origin = rospy.get_param("~lat_origin", 41.5489)
-        self.lon_origin = rospy.get_param("~lon_origin", -85.7965)
+        self.lat_origin = rospy.get_param("~lat_origin", 41.55223419839)
+        self.lon_origin = rospy.get_param("~lon_origin", -85.79769938884)
         self.map_frame = rospy.get_param("~map_frame", "map")
         self.utm_frame = rospy.get_param("~utm_frame", "actual_utm_no_offset")
         self.publish_rate = rospy.get_param("~publish_rate", 10.0)  # Hz
