@@ -1,0 +1,10 @@
+<launch>
+  <node pkg="lanelet_map_viz"
+        type="viz_browser.py"
+        name="lanelet_web_viz"
+        output="screen">
+    <param name="map_file"
+           value="/home/cholito/catkin_ws/src/lanelet_map_viz/maps/wes_roads_shifted.osm"/>
+  </node>
+</launch>
+
