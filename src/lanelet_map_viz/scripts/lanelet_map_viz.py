@@ -2,12 +2,10 @@
 
 import os
 import rospy
-from geometry_msgs.msg import Point
-from visualization_msgs.msg import Marker, MarkerArray
-
 import lanelet2
 from lanelet2.projection import UtmProjector
-
+from geometry_msgs.msg import Point
+from visualization_msgs.msg import Marker, MarkerArray
 
 #  CLASS 1: converts Lanelet2 geometry to ROS Points
 class LaneletConverter:
@@ -30,9 +28,9 @@ class LaneletConverter:
 
 #  CLASS 2: Holds visual style configs for easy editing
 class MarkerStyle:
-    LEFT_COLOR = (1.0, 1.0, 1.0, 0.5)
-    RIGHT_COLOR = (1.0, 1.0, 1.0, 0.5)
-    CENTER_COLOR = (1.0, 1.0, 0.0, 1.0)
+    LEFT_COLOR = (1.0, 1.0, 1.0, 1)
+    RIGHT_COLOR = (1.0, 1.0, 1.0, 1)
+    CENTER_COLOR = (1.0, 1.0, 0.0, .2)
 
     LEFT_WIDTH = 0.15
     RIGHT_WIDTH = 0.15
