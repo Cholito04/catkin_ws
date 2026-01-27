@@ -13,7 +13,7 @@ RUN THE FOLLOWING COMMANDS:
 1. cd ~/catkin_ws
 2. catkin_make (might take a while)
 3. source devel/setup.bash (run everytime you want to work on the workspace/open a new terminal)
-4. roslaunch lanelet_map_viz visualize.launch map_file:=/home/<username>/catkin_ws/src/lanelet_map_viz/maps/new_lanelet2_maps.osm frame_id:=map
+4. roslaunch lanelet_map_viz visualize.launch map_file:=/home/<username>/catkin_ws/src/lanelet_map_viz/maps/wes_shifted_maps.osm frame_id:=map
 
 Rvizz should open after that(make sure to change username to whatever your username is in linux or just copy the path of the new_lanelet2_maps.osm after the equal.
 in rviz click add in the bottom left go to "by topics" and add the lanelet_markers , markerArray you should see things in the display might need to zoom out a tadbit. 
