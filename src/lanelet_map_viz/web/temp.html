@@ -60,6 +60,7 @@
 
     <script src="https://cdn.jsdelivr.net/npm/three@0.159.0/build/three.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/three@0.159.0/examples/js/controls/OrbitControls.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three.meshline@1.4.0/dist/THREE.MeshLine.min.js"></script>
 
 </head>
 <body>
@@ -71,8 +72,10 @@
 
 // base class
 class Drawable {
+    onAdd(renderer) {}
     update(dt) {}
-    draw(renderer) {}
+    draw2D(renderer) {}
+    draw3D(renderer) {}
 }
 
 class Renderer2D {
@@ -89,12 +92,27 @@ class Renderer2D {
 
         this.drawables = [];
         this.lastTime = performance.now();
-
+        
+        this.running = false;
         this.render = this.render.bind(this);
     }
 
+    //start and stopping the running for toggle purposes
+    start() {
+        if (this.running) return;
+        this.running = true;
+        requestAnimationFrame(this.render);
+    }
+
+    stop() {
+        this.running = false;
+    }
+
     add(drawable) {
-        this.drawables.push(drawable);
+        //prevent duplicate drawables
+        if (!this.drawables.includes(drawable)){
+            this.drawables.push(drawable);
+        }
     }
 
     clear() {
@@ -115,31 +133,124 @@ class Renderer2D {
     }
 
     render(time) {
+
+        if (!this.running) return;
+
         const dt = (time - this.lastTime) / 1000;
         this.lastTime = time;
+
         this.updateCamera(vehicle.pose);
         this.clear();
 
         for (const d of this.drawables) {
             d.update(dt);
-            d.draw(this);
+            d.draw2D?.(this);
         }
 
         requestAnimationFrame(this.render);
     }
 }
 
+class Renderer3d {
+    constructor(threeContainer) {
+        this.container = threeContainer;
+        this.scene = new THREE.Scene();
+        this.scene.background = new THREE.Color(0x222222);
+        this.camera = new THREE.PerspectiveCamera(
+            60,
+            window.innerWidth / window.innerHeight,
+            0.1,
+            1000
+        );
+        this.camera.position.set(0, 20, 50); 
+        
+
+        this.renderer = new THREE.WebGLRenderer({antialias: true});
+        this.renderer.setSize(window.innerWidth, window.innerHeight);
+        this.container.appendChild(this.renderer.domElement);
+
+        this.controls = new THREE.OrbitControls(
+            this.camera, 
+            this.renderer.domElement
+        );
+        this.drawables = [];
+        this.lastTime = performance.now();
+
+        this.running = false;
+        this.render = this.render.bind(this);
+        this.follow = true;
+
+
+        this.controls.enableDamping = true;
+        this.controls.dampingFactor = 0.1;
+        this.controls.enablePan = true;
+        this.controls.enableZoom = true;
+    }
+
+    start() {
+        if (this.running) return;
+        this.running = true;
+        requestAnimationFrame(this.render);
+    }
+
+    stop(){
+        this.running = false;
+    }
+
+    add(drawable) {
+        drawable.onAdd?.(this);
+        //prevent duplicate drawables
+        if (!this.drawables.includes(drawable)){
+            this.drawables.push(drawable);
+        }
+    }
+
+    updateCamera(vehicle) {
+        if (!vehicle || !this.follow) return;
+
+        this.controls.enabled = false;
+
+        const target = new THREE.Vector3(vehicle.x, 0, -vehicle.y);
+        this.camera.position.lerp(
+            target.clone().add(new THREE.Vector3(0, 20, 50)),
+            0.1
+        );
+        this.controls.target.lerp(target, 0.1);
+    }
+
+
+    render(time) {
+        if (!this.running) return;
+        
+        const dt = (time - this.lastTime) / 1000;
+        this.lastTime = time;
+
+        this.updateCamera(vehicle.pose);
+        this.drawables.forEach(d => { 
+            d.update?.(dt);
+            d.draw3D?.(this);
+        });
+
+        this.controls.update();
+        this.renderer.render(this.scene, this.camera);
+
+        requestAnimationFrame(this.render);
+    }
+}
+
+
 class LaneletLayer extends Drawable {
     constructor(mapData) {
         super();
         this.mapData = mapData;
+        this.lines3D = [];
     }
 
-    draw(renderer) {
+    draw2D(renderer) {
         if (!this.mapData) return;
 
         this.mapData.forEach(ll => {
-            this.drawLine(renderer, ll.left, "#ffff00", 2);
+            this.drawLine(renderer, ll.left, "#ffffff", 2);
             this.drawLine(renderer, ll.right, "#ffffff", 2);
             this.drawLine(renderer, ll.center, "#0000ff", 0.5);
         });
@@ -158,6 +269,48 @@ class LaneletLayer extends Drawable {
 
         ctx.stroke();
     }
+
+    onAdd(renderer) {
+        if (!(renderer instanceof Renderer3d)) return;
+        
+        this.scene = renderer.scene;
+    }
+
+    clear3D() { 
+        this.lines3D.forEach(l => {
+            l.geometry.dispose();
+            l.material.dispose();
+            this.scene.remove(l);
+        });
+        this.lines3D = [];
+    }
+
+    build3D() {
+        this.clear3D();
+
+        if (!this.mapData) return;
+
+        this.mapData.forEach(ll => {
+            this.addLine3D(ll.left, 0xffff00);
+            this.addLine3D(ll.right, 0xffffff);
+            this.addLine3D(ll.center, 0x0000ff);
+        });
+    }
+
+    addLine3D(points, color) {
+        const line = new THREE.MeshLineMaterial({
+            color,
+            lineWidth: 0.2,  //world units
+            depthTest: true, 
+            trasparent: false
+        });
+
+        const mesh = new THREE.Mesh(line.geometry, material);
+
+        this.scene.add(line);
+        this.lines3D.push(line);
+    }
+
 }
 
 class VehicleEntity extends Drawable {
@@ -174,7 +327,7 @@ class VehicleEntity extends Drawable {
         // future update velocity smoothing, prediction, etc
     }
 
-    draw(renderer) {
+    draw2D(renderer) {
         if (!this.pose) return;
 
         const { x, y, yaw } = this.pose;
@@ -197,28 +350,29 @@ class VehicleEntity extends Drawable {
     }
 }
 
-const canvas = document.getElementById("map");
-const threeContainer = document.getElementById("three-container");
-let is3D = false;
-
 document.getElementById("toggleView").addEventListener("click", () => {
     is3D = !is3D;
 
     if (is3D) {
+        renderer.stop();
         canvas.style.display = "none";
         threeContainer.style.display = "block";
-        isit3D(); // initialize Three.js scene
+        renderer3d.start();
+        renderer3d.camera.position.set(mapCenter.x, 30, -mapCenter.y + 50);
+        renderer3d.camera.lookAt(mapCenter.x, 0, -mapCenter.y);
+        renderer3d.controls.target.set(mapCenter.x, 0, -mapCenter.y);
+        renderer3d.controls.update();
         document.getElementById("toggleView").innerText = "Switch to 2D";
     } else {
         canvas.style.display = "block";
+        renderer3d.stop();
         threeContainer.style.display = "none";
+        
+        renderer.start();
         document.getElementById("toggleView").innerText = "Switch to 3D";
+        
     }
 });
-
-const ctx = canvas.getContext("2d");
-const renderer = new Renderer2D(canvas);
-
 
 canvas.width = window.innerWidth;
 canvas.height = window.innerHeight;
@@ -268,75 +422,26 @@ canvas.addEventListener("wheel", e => {
 
     renderer.camera.x = wx - mouseX / renderer.camera.zoom;
     renderer.camera.y = wy + mouseY / renderer.camera.zoom;
-    console.log("zoom:", renderer.camera.zoom)
+    console.log("zoom:", renderer.camera.zoom);
 });
 
 window.addEventListener("keydown", e => {
     if (e.key === "f") {
         renderer.camera.follow = true;
+        renderer3d.follow = !renderer3d.follow;
+        renderer3d.controls.enabled = !renderer3d.follow;
     }
 });
 
-const DATA_URL = `http://localhost:45831/data`;
+window.addEventListener("resize", () => {
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
 
-let mapData = null;
-let vehicle = new VehicleEntity();
-let mapCenter = {x: 0, y: 0 };
+    renderer3d.camera.aspect = window.innerWidth / window.innerHeight;
+    renderer3d.camera.updateProjectionMatrix();
+    renderer3d.renderer.setSize(window.innerWidth, window.innerHeight);
+});
 
-// UTILITIES
-let scene, camera3D, controls, vehicleMesh, laneletLines = [];
-
-function isit3D() {
-    if (scene) return; // already initialized
-
-    scene = new THREE.Scene();
-    scene.background = new THREE.Color(0x222222);
-
-    camera3D = new THREE.PerspectiveCamera(60, window.innerWidth/window.innerHeight, 0.1, 1000);
-    camera3D.position.set(0, 20, 50);
-
-    renderer3d = new THREE.WebGLRenderer({ antialias: true });
-    renderer3d.setSize(window.innerWidth, window.innerHeight);
-    threeContainer.appendChild(renderer3d.domElement);
-
-    controls = new THREE.OrbitControls(camera3D, renderer3d.domElement);
-    controls.target.set(0, 0, 0);
-    controls.update();
-
-    const gridHelper = new THREE.GridHelper(200, 50);
-    scene.add(gridHelper);
-
-    animate3D();
-
-}
-
-function animate3D(){
-    requestAnimationFrame(animate3D);
-
-    if (vehicle.pose) {
-        const { x, y } = vehicle.pose;
-    }
-    renderer3d.render(scene, camera3D);
-
-}
-
-function computeMapCenter(mapData) {
-    let xs = [], ys = [];
-    mapData.forEach(ll => {
-        ll.center.forEach(p => {
-            xs.push(p[0]);
-            ys.push(p[1]);
-        });
-    });
-    mapCenter.x = xs.reduce((a,b) => a+b)/xs.length;
-    mapCenter.y = ys.reduce((a,b)=>a+b)/ys.length;
-}
-
-const lanelets = new LaneletLayer(mapData);
-
-renderer.add(lanelets);
-renderer.add(vehicle);
-requestAnimationFrame(renderer.render);
 
 // DATA FETCH
 function fetchData() {
@@ -344,17 +449,51 @@ function fetchData() {
         .then(r => r.json())
         .then(d => {
             lanelets.mapData = d.map;
-            if (d.map && !mapData) {
+            if (d.map && d.map !== mapData) {
+                mapData = d.map;
+                lanelets.build3D();
                 computeMapCenter(d.map);
+
             }
             vehicle.setPose(d.vehicle);
-            //if (is3D && mapData) drawLanelets3D(mapData);
-            //if (is3D && vehicle) drawVehicle3D(vehicle);
         })
         .catch(() => {});
 }
 
 setInterval(fetchData, 100);
+
+function main() {
+    const canvas = document.getElementById("map");
+    const threeContainer = document.getElementById("three-container");
+
+    const ctx = canvas.getContext("2d");
+
+    const renderer = new Renderer2D(canvas);
+    const renderer3d = new Renderer3d(threeContainer);
+
+    const DATA_URL = `http://localhost:55957/data`;
+
+    let mapData = null;
+    let mapCenter = {x: 0, y: 0 };
+
+    const lanelets = new LaneletLayer(mapData);
+    const vehicle = new VehicleEntity();
+
+    // add drawables ONCE
+    renderer.add(lanelets);
+    renderer.add(vehicle);
+
+    renderer3d.add(lanelets);
+    renderer3d.add(vehicle);
+
+    // start in 2D
+    renderer.start();
+    threeContainer.style.display = "none";
+
+    let is3D = false;
+
+}
+main();
 </script>
 
 </body>
