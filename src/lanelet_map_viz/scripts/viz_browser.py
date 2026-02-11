@@ -69,7 +69,7 @@ def pose_callback(msg):
 
 
 def load_lanelet_map(map_path):
-    origin = lanelet2.io.Origin(42.28449, -85.61864)
+    origin = lanelet2.io.Origin(41.54938912945, -85.79313557283)
     projector = UtmProjector(origin)
 
     llmap = lanelet2.io.load(map_path, projector)

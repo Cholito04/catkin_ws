@@ -103,6 +103,7 @@ class Renderer3d {
         this.render = this.render.bind(this);
         this.follow = true;
 
+        //set up orbit controls for camera manipulation
         this.controls = new OrbitControls(
             this.camera,
             this.renderer.domElement
@@ -112,6 +113,30 @@ class Renderer3d {
         this.controls.dampingFactor = 0.1;
         this.controls.enablePan = true;
         this.controls.enableZoom = true;
+        this.controls.minPolarAngle = 0; // allow looking straight down
+        this.controls.maxPolarAngle = Math.PI / 2; // prevent going underground
+        this.controls.minDistance = 5;
+
+        //set ground plane
+        const groundGeo= new THREE.PlaneGeometry(5000, 5000);
+        const groundMat = new THREE.MeshBasicMaterial({color: 0x2a2a2a, side: THREE.DoubleSide});
+        const ground = new THREE.Mesh(groundGeo, groundMat);
+        
+        // rotate to lie flat
+        ground.rotation.x = -Math.PI / 2;
+        ground.position.y = 0;
+        ground.receiveShadow = true;
+        this.scene.add(ground);
+
+        // ambient light
+        const ambientLight = new THREE.AmbientLight(0xffffff, 0.6);
+        this.scene.add(ambientLight);
+
+        // directional light
+        const dirLight = new THREE.DirectionalLight(0xffffff, 0.8);
+        dirLight.position.set(50, 100, -50);
+        dirLight.castShadow = true;
+        this.scene.add(dirLight);
     }
 
     start() {
@@ -152,6 +177,7 @@ class Renderer3d {
         this.controls.update();
 
         this.updateCamera(vehicle.pose);
+        this.camera.position.y = Math.max(this.camera.position.y, 2); // prevent going underground
         this.drawables.forEach(d => { 
             d.update?.(dt);
             d.draw3D?.(this);
