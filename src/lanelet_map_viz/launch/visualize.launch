@@ -4,8 +4,8 @@
 
   <!-- Include your map-to-UTM TF node -->
 <include file="$(find map_tf_publisher)/launch/map_to_utm_tf.launch">
-    <arg name="lat_origin" value="41.55223419839"/>
-    <arg name="lon_origin" value="-85.79769938884"/>
+    <arg name="lat_origin" value="41.54938912945"/>
+    <arg name="lon_origin" value="-85.79313557283"/>
     <arg name="map_frame" value="$(arg frame_id)"/>
     <arg name="utm_frame" value="actual_utm_no_offset"/>
 </include>
