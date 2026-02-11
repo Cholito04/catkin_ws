@@ -126,7 +126,7 @@ class LaneletVisualizerNode:
             raise FileNotFoundError(self.map_file)
 
     def _load_map(self):
-        origin = lanelet2.io.Origin(42.28449400001, -85.6186400996)
+        origin = lanelet2.io.Origin(41.54938912945, -85.79313557283)
         projector = UtmProjector(origin)
 
         rospy.loginfo(f"[LaneletVisualizer] Loading map: {self.map_file}")
