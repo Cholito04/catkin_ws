@@ -76,9 +76,21 @@
     </script>
 </head>
 <body>
-    <button id="toggleView" style="position:absolute; top:10px; right:10px; z-index:20;">Switch to 3D</button>
+    <button id="toggleView" style="position:absolute; top:10px; left:10px; z-index:20;">Switch to 3D</button>
     <canvas id="map"></canvas>
-    <div id = "three-container"></div>
+    <div id="three-container"></div>
+
+    <div id="stop-controls" style="position:absolute; top:50px; right:10px;
+        background:rgba(0,0,0,0.7); padding:12px; border-radius:8px; color:#fff; z-index:10;">
+        <div id="stopCount" style="font-size:10px; color:#aaa; margin-bottom:6px;">Stops: loading...</div>
+        <label>Start</label><br>
+        <select id="startSelect" style="width:160px; margin-bottom:8px;"></select><br>
+        <label>Goal</label><br>
+        <select id="goalSelect" style="width:160px; margin-bottom:8px;"></select><br>
+        <button id="computeRoute" style="width:160px;">Compute Route</button>
+    </div>
+
+
     <script type="module" src="/main.js"></script>
-    </body>
+</body>
 </html>
