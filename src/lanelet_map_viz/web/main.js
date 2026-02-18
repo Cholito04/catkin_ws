@@ -305,6 +305,74 @@ class VehicleEntity extends Drawable {
     }
 }
 
+class StopsLayer extends Drawable {
+    constructor() {
+        super();
+        this.stops = {};         // populated from /stops fetch
+        this.selectedStart = null;
+        this.selectedGoal  = null;
+    }
+
+    setStops(stops) {
+        this.stops = stops;
+    }
+
+    setSelection(startKey, goalKey) {
+        this.selectedStart = startKey;
+        this.selectedGoal  = goalKey;
+    }
+
+    draw2D(renderer) {
+        Object.entries(this.stops).forEach(([key, stop]) => {
+            const s = renderer.worldToScreen(stop.x, stop.y);
+            const ctx = renderer.ctx;
+            const isStart = key === this.selectedStart;
+            const isGoal  = key === this.selectedGoal;
+
+            // pin circle
+            ctx.beginPath();
+            ctx.arc(s.x, s.y, 8, 0, Math.PI * 2);
+            ctx.fillStyle = isStart ? "#00ff00" : isGoal ? "#ff4444" : "#ffaa00";
+            ctx.fill();
+            ctx.strokeStyle = "#ffffff";
+            ctx.lineWidth = 1.5;
+            ctx.stroke();
+
+            // label
+            ctx.fillStyle = "#ffffff";
+            ctx.font = "11px sans-serif";
+            ctx.fillText(stop.display_name, s.x + 12, s.y + 4);
+        });
+    }
+}
+
+class RouteLayer extends Drawable {
+    constructor() {
+        super();
+        this.waypoints = [];
+    }
+
+    setWaypoints(waypoints) {
+        this.waypoints = waypoints;
+    }
+
+    draw2D(renderer) {
+        if (this.waypoints.length < 2) return;
+        const ctx = renderer.ctx;
+        ctx.strokeStyle = "#00ffff";
+        ctx.lineWidth = 3;
+        ctx.setLineDash([6, 4]);
+        ctx.beginPath();
+        this.waypoints.forEach((p, i) => {
+            const s = renderer.worldToScreen(p[0], p[1]);
+            i === 0 ? ctx.moveTo(s.x, s.y) : ctx.lineTo(s.x, s.y);
+        });
+        ctx.stroke();
+        ctx.setLineDash([]);
+    }
+}
+
+
 const canvas = document.getElementById("map");
 const threeContainer = document.getElementById("three-container");
 
@@ -321,12 +389,18 @@ let mapCenter = {x: 0, y: 0 };
 const lanelets = new LaneletLayer(mapData);
 const vehicle = new VehicleEntity();
 
+const stopsLayer = new StopsLayer();
+const routeLayer = new RouteLayer();
+
 // add drawables ONCE
 renderer.add(lanelets);
 renderer.add(vehicle);
 
 renderer3d.add(lanelets);
 renderer3d.add(vehicle);
+
+renderer.add(stopsLayer);
+renderer.add(routeLayer);
 
 // start in 2D
 renderer.start();
@@ -355,6 +429,19 @@ document.getElementById("toggleView").addEventListener("click", () => {
         
     }
 });
+
+function computeMapCenter(mapData) {
+    let sumX = 0, sumY = 0, count = 0;
+    mapData.forEach(ll => {
+        ll.center.forEach(p => {
+            sumX += p[0]; sumY += p[1]; count++;
+        });
+    });
+    mapCenter.x = sumX / count;
+    mapCenter.y = sumY / count;
+    renderer.camera.x = mapCenter.x;
+    renderer.camera.y = mapCenter.y;
+}
 
 canvas.width = window.innerWidth;
 canvas.height = window.innerHeight;
@@ -420,6 +507,7 @@ function fetchData() {
         .then(d => {
             lanelets.mapData = d.map;
             if (d.map && !mapData) {
+                mapData = d.map;                
                 lanelets.build3D();
                 computeMapCenter(d.map);
             }
@@ -427,5 +515,67 @@ function fetchData() {
         })
         .catch(() => {});
 }
+
+
+// Fetch stops once on load and populate dropdowns
+function fetchStops() {
+    fetch(`http://localhost:${PORT}/stops`)
+        .then(r => r.json())
+        .then(stops => {
+            console.log("stops received:", Object.keys(stops).length, stops);
+            if (Object.keys(stops).length === 0) {
+                console.warn("Received empty stops data");
+                setTimeout(fetchStops, 500);
+                return;
+            }
+            stopsLayer.setStops(stops);
+
+            const startSel = document.getElementById("startSelect");
+            const goalSel  = document.getElementById("goalSelect");
+
+            Object.entries(stops).forEach(([key, stop]) => {
+                [startSel, goalSel].forEach(sel => {
+                    const opt = document.createElement("option");
+                    opt.value = key;
+                    opt.textContent = stop.display_name;
+                    sel.appendChild(opt);
+                });
+            });
+
+            // default goal to second stop so they're not the same
+            if (goalSel.options.length > 1) goalSel.selectedIndex = 1;
+
+            updateSelection();
+        })
+        .catch(() => setTimeout(fetchStops, 500));
+}
+fetchStops();
+
+function updateSelection() {
+    const start = document.getElementById("startSelect").value;
+    const goal  = document.getElementById("goalSelect").value;
+    stopsLayer.setSelection(start, goal);
+}
+
+document.getElementById("startSelect")?.addEventListener("change", updateSelection);
+document.getElementById("goalSelect")?.addEventListener("change", updateSelection);
+
+// Compute route button — calls /route and draws waypoints
+// ---- ROUTING INTERFACE: response comes from your teammate's algo ----
+document.getElementById("computeRoute")?.addEventListener("click", () => {
+    const start = document.getElementById("startSelect").value;
+    const goal  = document.getElementById("goalSelect").value;
+
+    fetch(`http://localhost:${PORT}/route`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ start, goal })
+    })
+    .then(r => r.json())
+    .then(data => {
+        routeLayer.setWaypoints(data.waypoints);
+    })
+    .catch(err => console.error("Route request failed:", err));
+});
 
 setInterval(fetchData, 100);
