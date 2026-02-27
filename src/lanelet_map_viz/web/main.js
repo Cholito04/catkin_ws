@@ -1,5 +1,6 @@
 import * as THREE from 'three';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+import {TDSLoader} from "three/addons/loaders/TDSLoader.js"
 
 // base class
 class Drawable {
@@ -116,17 +117,39 @@ class Renderer3d {
         this.controls.minPolarAngle = 0; // allow looking straight down
         this.controls.maxPolarAngle = Math.PI / 2; // prevent going underground
         this.controls.minDistance = 5;
+        this.controls.maxTargetRadius = 2000;
+        this.camera.near = 0.5;
+        this.camera.far = 5000;
+        this.camera.updateProjectionMatrix();
+
+        this.world = new THREE.Group();
+        this.scene.add(this.world);
+
+        this.layers = {
+            ground: new THREE.Group(),
+            roads: new THREE.Group(),
+            laneMarkings: new THREE.Group(),
+            vehicles: new THREE.Group(),
+            debug: new THREE.Group()
+        };
+
+        Object.values(this.layers).forEach(g => this.world.add(g));
 
         //set ground plane
-        const groundGeo= new THREE.PlaneGeometry(5000, 5000);
-        const groundMat = new THREE.MeshBasicMaterial({color: 0x2a2a2a, side: THREE.DoubleSide});
+        const groundGeo = new THREE.PlaneGeometry(5000, 5000);
+        const groundMat = new THREE.MeshStandardMaterial({
+            color: 0x2a2a2a,
+            roughness: 1,
+            metalness: 0
+        });
+
+        //lie flat and receive shadows
         const ground = new THREE.Mesh(groundGeo, groundMat);
-        
-        // rotate to lie flat
         ground.rotation.x = -Math.PI / 2;
         ground.position.y = 0;
         ground.receiveShadow = true;
-        this.scene.add(ground);
+
+        this.layers.ground.add(ground);
 
         // ambient light
         const ambientLight = new THREE.AmbientLight(0xffffff, 0.6);
@@ -137,6 +160,12 @@ class Renderer3d {
         dirLight.position.set(50, 100, -50);
         dirLight.castShadow = true;
         this.scene.add(dirLight);
+
+        //road mesh
+        this.roadMaterial = new THREE.MeshStandardMaterial({
+            color: 0x3b3b3b, 
+            roughness: 0.9
+        });
     }
 
     start() {
@@ -157,16 +186,17 @@ class Renderer3d {
         }
     }
 
-    updateCamera(vehicle) {
-        if (!vehicle || !this.follow) return;
-            this.controls.enabled = false;
+    updateCamera() {
+        if (!this.follow) return;
+        const v = this.drawables.find(d => d instanceof VehicleEntity);
+        if (!v?.pose) return;
 
-            const target = new THREE.Vector3(vehicle.x, 9, -vehicle.y);
-            this.camera.position.lerp(
-                target.clone().add(new THREE.Vector3(0, 20, 50)),
-                0.1
-            );
-            this.controls.target.lerp(target, 0.1);
+        const target = new THREE.Vector3(v.pose.x, 9, -v.pose.y);
+        this.camera.position.lerp(
+            target.clone().add(new THREE.Vector3(0, 20, 50)),
+            0.1
+        );
+        this.controls.target.lerp(target, 0.1);
     }
 
     render(time) {
@@ -176,7 +206,7 @@ class Renderer3d {
         this.lastTime = time;
         this.controls.update();
 
-        this.updateCamera(vehicle.pose);
+        this.updateCamera();
         this.camera.position.y = Math.max(this.camera.position.y, 2); // prevent going underground
         this.drawables.forEach(d => { 
             d.update?.(dt);
@@ -223,17 +253,22 @@ class LaneletLayer extends Drawable {
     onAdd(renderer) {
         if (!(renderer instanceof Renderer3d)) return;
         
-        this.scene = renderer.scene;
+        this.lineGroup = new THREE.Group();
+        renderer.layers.laneMarkings.add(this.lineGroup);
+    
+        this.build3D();
     }
+
 
     clear3D() { 
         this.lines3D.forEach(l => {
             l.geometry.dispose();
             l.material.dispose();
-            this.scene.remove(l);
+            this.lineGroup.remove(l);
         });
         this.lines3D = [];
     }
+
     build3D() {
         this.clear3D();
 
@@ -251,7 +286,7 @@ class LaneletLayer extends Drawable {
         const vertices = [];
 
         points.forEach(p => {
-            vertices.push(p[0], 0, -p[1]); // y up, z forward
+            vertices.push(p[0], 0.02, -p[1]); // y up, z forward
         });
 
         geometry.setAttribute(
@@ -262,7 +297,7 @@ class LaneletLayer extends Drawable {
         const material = new THREE.LineBasicMaterial({ color });
         const line = new THREE.Line(geometry, material);
 
-        this.scene.add(line);
+        this.lineGroup.add(line);
         this.lines3D.push(line);
     }
 
@@ -272,14 +307,37 @@ class VehicleEntity extends Drawable {
     constructor() {
         super();
         this.pose = null;
+        this.mesh = null;
+
+        //fake motion state
+        this.t = 0;
+        this.radius = 25;
+        this.angularSpeed = 0.4;
     }
 
-    setPose(pose) {
-        this.pose = pose;
+    onAdd(renderer) {
+        if (!(renderer instanceof Renderer3d)) return;
+
+        this.vGroup = new THREE.Group();
+        renderer.layers.vehicles.add(this.vGroup);
+
+        const loader = new TDSLoader();
+        loader.setResourcePath("./models/"); //textures folder
+        loader.setPath("./models/")
+
+        loader.load("Toyota Supra JZA80 Mark4 1994.3ds", object => {
+        object.scale.set(0.01, 0.01, 0.01);
+        object.rotation.x = -Math.PI / 2;
+        this.mesh = object;
+        this.vGroup.add(this.mesh);
+        });
     }
 
     update(dt) {
-        // future update velocity smoothing, prediction, etc
+        if (this.mesh && this.pose) {
+            this.mesh.position.set(this.pose.x, 0.5, -this.pose.y);
+            this.mesh.rotation.y = this.pose.yaw;
+        }
     }
 
     draw2D(renderer) {
@@ -302,6 +360,15 @@ class VehicleEntity extends Drawable {
         ctx.fill();
 
         ctx.restore();
+    }
+
+    draw3D(renderer){
+        if (!this.mesh || !this.pose) return;
+
+            const { x, y, yaw } = this.pose;
+            this.mesh.position.set(x, 0.5, -y);
+            this.mesh.rotation.y = yaw;
+                
     }
 }
 
@@ -342,6 +409,33 @@ class StopsLayer extends Drawable {
             ctx.fillStyle = "#ffffff";
             ctx.font = "11px sans-serif";
             ctx.fillText(stop.display_name, s.x + 12, s.y + 4);
+        });
+    }
+
+    onAdd(renderer) {
+        if (!(renderer instanceof Renderer3d)) return;
+        this.scene = renderer.scene;
+        this.markers3D = [];
+    }
+
+    draw3D(renderer) {
+        // remove old markers
+        this.markers3D.forEach(m => this.scene.remove(m));
+        this.markers3D = [];
+
+        Object.entries(this.stops).forEach(([key, stop]) => {
+            const isStart = key === this.selectedStart;
+            const isGoal  = key === this.selectedGoal;
+            const color = isStart ? 0x00ff00 : isGoal ? 0xff4444 : 0xffaa00;
+
+            // sphere marker
+            const geo = new THREE.SphereGeometry(3, 10, 10);
+            const mat = new THREE.MeshBasicMaterial({ color });
+            const sphere = new THREE.Mesh(geo, mat);
+            sphere.position.set(stop.x, 1, -stop.y); // y up, z forward same as your map
+
+            this.scene.add(sphere);
+            this.markers3D.push(sphere);
         });
     }
 }
@@ -401,6 +495,8 @@ renderer3d.add(vehicle);
 
 renderer.add(stopsLayer);
 renderer.add(routeLayer);
+
+renderer3d.add(stopsLayer);
 
 // start in 2D
 renderer.start();
@@ -498,6 +594,14 @@ window.addEventListener("keydown", e => {
     if (e.key === "f") {
         renderer.camera.follow = true;
     }
+});
+
+window.addEventListener("resize", () => {
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+    renderer3d.renderer.setSize(window.innerWidth, window.innerHeight);
+    renderer3d.camera.aspect = window.innerWidth / window.innerHeight;
+    renderer3d.camera.updateProjectionMatrix();
 });
 
 // DATA FETCH
