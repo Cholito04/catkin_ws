@@ -1,8 +1,8 @@
-# Install script for directory: /home/cholito/catkin_ws/src/map_tf_publisher
+# Install script for directory: /home/ubuntu/Desktop/catkin_ws/src/map_tf_publisher
 
 # Set the install prefix
 if(NOT DEFINED CMAKE_INSTALL_PREFIX)
-  set(CMAKE_INSTALL_PREFIX "/home/cholito/catkin_ws/install")
+  set(CMAKE_INSTALL_PREFIX "/home/ubuntu/Desktop/catkin_ws/install")
 endif()
 string(REGEX REPLACE "/$" "" CMAKE_INSTALL_PREFIX "${CMAKE_INSTALL_PREFIX}")
 
@@ -38,17 +38,17 @@ if(NOT DEFINED CMAKE_CROSSCOMPILING)
 endif()
 
 if("x${CMAKE_INSTALL_COMPONENT}x" STREQUAL "xUnspecifiedx" OR NOT CMAKE_INSTALL_COMPONENT)
-  file(INSTALL DESTINATION "${CMAKE_INSTALL_PREFIX}/lib/pkgconfig" TYPE FILE FILES "/home/cholito/catkin_ws/build/map_tf_publisher/catkin_generated/installspace/map_tf_publisher.pc")
+  file(INSTALL DESTINATION "${CMAKE_INSTALL_PREFIX}/lib/pkgconfig" TYPE FILE FILES "/home/ubuntu/Desktop/catkin_ws/build/map_tf_publisher/catkin_generated/installspace/map_tf_publisher.pc")
 endif()
 
 if("x${CMAKE_INSTALL_COMPONENT}x" STREQUAL "xUnspecifiedx" OR NOT CMAKE_INSTALL_COMPONENT)
   file(INSTALL DESTINATION "${CMAKE_INSTALL_PREFIX}/share/map_tf_publisher/cmake" TYPE FILE FILES
-    "/home/cholito/catkin_ws/build/map_tf_publisher/catkin_generated/installspace/map_tf_publisherConfig.cmake"
-    "/home/cholito/catkin_ws/build/map_tf_publisher/catkin_generated/installspace/map_tf_publisherConfig-version.cmake"
+    "/home/ubuntu/Desktop/catkin_ws/build/map_tf_publisher/catkin_generated/installspace/map_tf_publisherConfig.cmake"
+    "/home/ubuntu/Desktop/catkin_ws/build/map_tf_publisher/catkin_generated/installspace/map_tf_publisherConfig-version.cmake"
     )
 endif()
 
 if("x${CMAKE_INSTALL_COMPONENT}x" STREQUAL "xUnspecifiedx" OR NOT CMAKE_INSTALL_COMPONENT)
-  file(INSTALL DESTINATION "${CMAKE_INSTALL_PREFIX}/share/map_tf_publisher" TYPE FILE FILES "/home/cholito/catkin_ws/src/map_tf_publisher/package.xml")
+  file(INSTALL DESTINATION "${CMAKE_INSTALL_PREFIX}/share/map_tf_publisher" TYPE FILE FILES "/home/ubuntu/Desktop/catkin_ws/src/map_tf_publisher/package.xml")
 endif()
 

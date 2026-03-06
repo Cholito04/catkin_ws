@@ -1,4 +1,4 @@
-prefix=/home/cholito/catkin_ws/devel
+prefix=/home/ubuntu/Desktop/catkin_ws/devel
 
 Name: map_tf_publisher
 Description: Description of map_tf_publisher

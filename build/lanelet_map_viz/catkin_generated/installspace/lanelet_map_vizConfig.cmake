@@ -67,14 +67,14 @@ set(lanelet_map_viz_CONFIG_INCLUDED TRUE)
 
 # set variables for source/devel/install prefixes
 if("FALSE" STREQUAL "TRUE")
-  set(lanelet_map_viz_SOURCE_PREFIX /home/cholito/catkin_ws/src/lanelet_map_viz)
-  set(lanelet_map_viz_DEVEL_PREFIX /home/cholito/catkin_ws/devel)
+  set(lanelet_map_viz_SOURCE_PREFIX /home/ubuntu/Desktop/catkin_ws/src/lanelet_map_viz)
+  set(lanelet_map_viz_DEVEL_PREFIX /home/ubuntu/Desktop/catkin_ws/devel)
   set(lanelet_map_viz_INSTALL_PREFIX "")
   set(lanelet_map_viz_PREFIX ${lanelet_map_viz_DEVEL_PREFIX})
 else()
   set(lanelet_map_viz_SOURCE_PREFIX "")
   set(lanelet_map_viz_DEVEL_PREFIX "")
-  set(lanelet_map_viz_INSTALL_PREFIX /home/cholito/catkin_ws/install)
+  set(lanelet_map_viz_INSTALL_PREFIX /home/ubuntu/Desktop/catkin_ws/install)
   set(lanelet_map_viz_PREFIX ${lanelet_map_viz_INSTALL_PREFIX})
 endif()
 
@@ -156,7 +156,7 @@ foreach(library ${libraries})
     set(lib_path "")
     set(lib "${library}-NOTFOUND")
     # since the path where the library is found is returned we have to iterate over the paths manually
-    foreach(path /home/cholito/catkin_ws/install/lib;/home/cholito/catkin_ws/devel/lib;/opt/ros/noetic/lib)
+    foreach(path /home/ubuntu/Desktop/catkin_ws/install/lib;/opt/ros/noetic/lib)
       find_library(lib ${library}
         PATHS ${path}
         NO_DEFAULT_PATH NO_CMAKE_FIND_ROOT_PATH)

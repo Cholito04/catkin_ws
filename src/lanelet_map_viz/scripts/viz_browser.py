@@ -22,6 +22,9 @@ import utm
 #global variables to store data
 vehicle_pose = None
 map_data = None
+routing_graph = None
+traffic_rules = None
+llmap_global = None
 data_lock = threading.Lock()
 stops_data = {}
 
@@ -108,12 +111,21 @@ class DataHandler(SimpleHTTPRequestHandler):
             goal_stop = stops_data[body["goal"]]
             
 
-            waypoints = [start_stop["centerline_point"], goal_stop["centerline_point"]]
-            
+            start_ll = get_lanelet_by_id(llmap_global, start_stop["lanelet_id"])
+            goal_ll  = get_lanelet_by_id(llmap_global, goal_stop["lanelet_id"])
+
+            route_pts = None
+            if start_ll is not None and goal_ll is not None:
+                route_pts = compute_centerline_route_points(start_ll, goal_ll)
+
+            # fallback: straight line if routing fails
+            if not route_pts:
+                route_pts = [start_stop["centerline_point"], goal_stop["centerline_point"]]
+
             self.send_response(200)
             self.send_header('Content-Type', 'application/json')
             self.end_headers()
-            self.wfile.write(json.dumps(waypoints).encode()) 
+            self.wfile.write(json.dumps({"waypoints": route_pts}).encode())
         else:
             super().do_POST()
 
@@ -169,6 +181,64 @@ def find_nearest_lanelet(x, y, llmap):
                 best_point = [p.x, p.y]
 
     return best_lanelet_id, best_point
+    
+def get_lanelet_by_id(llmap, lanelet_id):
+    # laneletLayer in python behaves like a container; this works in many builds
+    for ll in llmap.laneletLayer:
+        if ll.id == lanelet_id:
+            return ll
+    return None
+
+def extract_lanelets_from_path(path_obj):
+    # Different lanelet2 python builds expose lanelets differently
+    for attr in ["lanelets", "getLanelets", "laneletSequence", "lanelet_sequence"]:
+        if hasattr(path_obj, attr):
+            try:
+                return getattr(path_obj, attr)()
+            except TypeError:
+                return getattr(path_obj, attr)
+            except Exception:
+                pass
+    try:
+        return list(path_obj)
+    except Exception:
+        return None
+
+def compute_centerline_route_points(start_lanelet, goal_lanelet):
+    global routing_graph
+    if routing_graph is None:
+        return None
+
+    # try common method names
+    path = None
+    for fn in ["shortestPath", "shortest_path"]:
+        if hasattr(routing_graph, fn):
+            try:
+                path = getattr(routing_graph, fn)(start_lanelet, goal_lanelet)
+                break
+            except Exception:
+                pass
+
+    if path is None:
+        return None
+
+    lanelets = extract_lanelets_from_path(path)
+    if not lanelets:
+        return None
+
+    pts = []
+    for ll in lanelets:
+        # centerline points are lanelet2 points with .x and .y
+        for p in ll.centerline:
+            pts.append([float(p.x), float(p.y)])
+
+    # de-duplicate consecutive identical points
+    filtered = []
+    for xy in pts:
+        if not filtered or xy != filtered[-1]:
+            filtered.append(xy)
+
+    return filtered if len(filtered) >= 2 else None
 
 
 def create_html_file(port):
@@ -215,6 +285,22 @@ def main():
     
     rospy.loginfo("Setting up subscribers...")
     llmap, lanelets_json, projector = load_lanelet_map(map_path)
+    global llmap_global, routing_graph, traffic_rules
+    llmap_global = llmap
+
+    # Build traffic rules + routing graph (done once)
+    try:
+        traffic_rules = lanelet2.traffic_rules.create("Germany", "Vehicle")
+    except Exception:
+        traffic_rules = lanelet2.traffic_rules.create(
+            lanelet2.traffic_rules.Locations.Germany,
+            lanelet2.traffic_rules.Participants.Vehicle
+        )
+
+    try:
+        routing_graph = lanelet2.routing.RoutingGraph(llmap_global, traffic_rules)
+    except Exception:
+        routing_graph = lanelet2.routing.RoutingGraph.build(llmap_global, traffic_rules)
     map_data = lanelets_json
     debug_map_bounds(llmap)
     rospy.loginfo(f"Loaded {len(map_data)} lanelets")

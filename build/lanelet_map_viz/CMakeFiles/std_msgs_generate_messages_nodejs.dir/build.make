@@ -43,10 +43,10 @@ RM = /usr/bin/cmake -E remove -f
 EQUALS = =
 
 # The top-level source directory on which CMake was run.
-CMAKE_SOURCE_DIR = /home/cholito/catkin_ws/src
+CMAKE_SOURCE_DIR = /home/ubuntu/Desktop/catkin_ws/src
 
 # The top-level build directory on which CMake was run.
-CMAKE_BINARY_DIR = /home/cholito/catkin_ws/build
+CMAKE_BINARY_DIR = /home/ubuntu/Desktop/catkin_ws/build
 
 # Utility rule file for std_msgs_generate_messages_nodejs.
 
@@ -63,10 +63,10 @@ lanelet_map_viz/CMakeFiles/std_msgs_generate_messages_nodejs.dir/build: std_msgs
 .PHONY : lanelet_map_viz/CMakeFiles/std_msgs_generate_messages_nodejs.dir/build
 
 lanelet_map_viz/CMakeFiles/std_msgs_generate_messages_nodejs.dir/clean:
-	cd /home/cholito/catkin_ws/build/lanelet_map_viz && $(CMAKE_COMMAND) -P CMakeFiles/std_msgs_generate_messages_nodejs.dir/cmake_clean.cmake
+	cd /home/ubuntu/Desktop/catkin_ws/build/lanelet_map_viz && $(CMAKE_COMMAND) -P CMakeFiles/std_msgs_generate_messages_nodejs.dir/cmake_clean.cmake
 .PHONY : lanelet_map_viz/CMakeFiles/std_msgs_generate_messages_nodejs.dir/clean
 
 lanelet_map_viz/CMakeFiles/std_msgs_generate_messages_nodejs.dir/depend:
-	cd /home/cholito/catkin_ws/build && $(CMAKE_COMMAND) -E cmake_depends "Unix Makefiles" /home/cholito/catkin_ws/src /home/cholito/catkin_ws/src/lanelet_map_viz /home/cholito/catkin_ws/build /home/cholito/catkin_ws/build/lanelet_map_viz /home/cholito/catkin_ws/build/lanelet_map_viz/CMakeFiles/std_msgs_generate_messages_nodejs.dir/DependInfo.cmake --color=$(COLOR)
+	cd /home/ubuntu/Desktop/catkin_ws/build && $(CMAKE_COMMAND) -E cmake_depends "Unix Makefiles" /home/ubuntu/Desktop/catkin_ws/src /home/ubuntu/Desktop/catkin_ws/src/lanelet_map_viz /home/ubuntu/Desktop/catkin_ws/build /home/ubuntu/Desktop/catkin_ws/build/lanelet_map_viz /home/ubuntu/Desktop/catkin_ws/build/lanelet_map_viz/CMakeFiles/std_msgs_generate_messages_nodejs.dir/DependInfo.cmake --color=$(COLOR)
 .PHONY : lanelet_map_viz/CMakeFiles/std_msgs_generate_messages_nodejs.dir/depend
 

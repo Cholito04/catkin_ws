@@ -1,8 +1,8 @@
-# Install script for directory: /home/cholito/catkin_ws/src/lanelet_map_viz
+# Install script for directory: /home/ubuntu/Desktop/catkin_ws/src/lanelet_map_viz
 
 # Set the install prefix
 if(NOT DEFINED CMAKE_INSTALL_PREFIX)
-  set(CMAKE_INSTALL_PREFIX "/home/cholito/catkin_ws/install")
+  set(CMAKE_INSTALL_PREFIX "/home/ubuntu/Desktop/catkin_ws/install")
 endif()
 string(REGEX REPLACE "/$" "" CMAKE_INSTALL_PREFIX "${CMAKE_INSTALL_PREFIX}")
 
@@ -38,17 +38,17 @@ if(NOT DEFINED CMAKE_CROSSCOMPILING)
 endif()
 
 if("x${CMAKE_INSTALL_COMPONENT}x" STREQUAL "xUnspecifiedx" OR NOT CMAKE_INSTALL_COMPONENT)
-  file(INSTALL DESTINATION "${CMAKE_INSTALL_PREFIX}/lib/pkgconfig" TYPE FILE FILES "/home/cholito/catkin_ws/build/lanelet_map_viz/catkin_generated/installspace/lanelet_map_viz.pc")
+  file(INSTALL DESTINATION "${CMAKE_INSTALL_PREFIX}/lib/pkgconfig" TYPE FILE FILES "/home/ubuntu/Desktop/catkin_ws/build/lanelet_map_viz/catkin_generated/installspace/lanelet_map_viz.pc")
 endif()
 
 if("x${CMAKE_INSTALL_COMPONENT}x" STREQUAL "xUnspecifiedx" OR NOT CMAKE_INSTALL_COMPONENT)
   file(INSTALL DESTINATION "${CMAKE_INSTALL_PREFIX}/share/lanelet_map_viz/cmake" TYPE FILE FILES
-    "/home/cholito/catkin_ws/build/lanelet_map_viz/catkin_generated/installspace/lanelet_map_vizConfig.cmake"
-    "/home/cholito/catkin_ws/build/lanelet_map_viz/catkin_generated/installspace/lanelet_map_vizConfig-version.cmake"
+    "/home/ubuntu/Desktop/catkin_ws/build/lanelet_map_viz/catkin_generated/installspace/lanelet_map_vizConfig.cmake"
+    "/home/ubuntu/Desktop/catkin_ws/build/lanelet_map_viz/catkin_generated/installspace/lanelet_map_vizConfig-version.cmake"
     )
 endif()
 
 if("x${CMAKE_INSTALL_COMPONENT}x" STREQUAL "xUnspecifiedx" OR NOT CMAKE_INSTALL_COMPONENT)
-  file(INSTALL DESTINATION "${CMAKE_INSTALL_PREFIX}/share/lanelet_map_viz" TYPE FILE FILES "/home/cholito/catkin_ws/src/lanelet_map_viz/package.xml")
+  file(INSTALL DESTINATION "${CMAKE_INSTALL_PREFIX}/share/lanelet_map_viz" TYPE FILE FILES "/home/ubuntu/Desktop/catkin_ws/src/lanelet_map_viz/package.xml")
 endif()
 

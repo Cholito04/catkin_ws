@@ -1,4 +1,4 @@
-prefix=/home/cholito/catkin_ws/devel
+prefix=/home/ubuntu/Desktop/catkin_ws/devel
 
 Name: lanelet_map_viz
 Description: Description of lanelet_map_viz

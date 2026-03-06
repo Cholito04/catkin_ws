@@ -4,5 +4,5 @@ PROJECT_PKG_CONFIG_INCLUDE_DIRS = "".split(';') if "" != "" else []
 PROJECT_CATKIN_DEPENDS = "".replace(';', ' ')
 PKG_CONFIG_LIBRARIES_WITH_PREFIX = "".split(';') if "" != "" else []
 PROJECT_NAME = "lanelet_map_viz"
-PROJECT_SPACE_DIR = "/home/cholito/catkin_ws/install"
+PROJECT_SPACE_DIR = "/home/ubuntu/Desktop/catkin_ws/install"
 PROJECT_VERSION = "0.0.0"
