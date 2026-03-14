@@ -92,5 +92,23 @@
 
 
     <script type="module" src="/main.js"></script>
+    <div id="controls-hint" style="
+        position: absolute;
+        bottom: 16px;
+        left: 50%;
+        transform: translateX(-50%);
+        background: rgba(0,0,0,0.6);
+        color: #ccc;
+        font-size: 12px;
+        padding: 8px 16px;
+        border-radius: 8px;
+        z-index: 20;
+        text-align: center;
+        pointer-events: none;
+        white-space: nowrap;
+    ">
+        <span id="controls-2d">Drag to pan | Scroll to zoom | F: re-center</span>
+        <span id="controls-3d" style="display:none;">Left drag to orbit | Right drag to pan | Scroll to zoom | F: re-follow</span>
+    </div>
 </body>
 </html>
