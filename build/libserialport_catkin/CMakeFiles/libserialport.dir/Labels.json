@@ -1,0 +1,43 @@
+{
+	"sources" : 
+	[
+		{
+			"file" : "/home/cholito/catkin_ws/build/libserialport_catkin/CMakeFiles/libserialport"
+		},
+		{
+			"file" : "/home/cholito/catkin_ws/build/libserialport_catkin/CMakeFiles/libserialport.rule"
+		},
+		{
+			"file" : "/home/cholito/catkin_ws/build/libserialport_catkin/CMakeFiles/libserialport-complete.rule"
+		},
+		{
+			"file" : "/home/cholito/catkin_ws/build/libserialport_catkin/libserialport-prefix/src/libserialport-stamp/libserialport-install.rule"
+		},
+		{
+			"file" : "/home/cholito/catkin_ws/build/libserialport_catkin/libserialport-prefix/src/libserialport-stamp/libserialport-mkdir.rule"
+		},
+		{
+			"file" : "/home/cholito/catkin_ws/build/libserialport_catkin/libserialport-prefix/src/libserialport-stamp/libserialport-download.rule"
+		},
+		{
+			"file" : "/home/cholito/catkin_ws/build/libserialport_catkin/libserialport-prefix/src/libserialport-stamp/libserialport-update.rule"
+		},
+		{
+			"file" : "/home/cholito/catkin_ws/build/libserialport_catkin/libserialport-prefix/src/libserialport-stamp/libserialport-patch.rule"
+		},
+		{
+			"file" : "/home/cholito/catkin_ws/build/libserialport_catkin/libserialport-prefix/src/libserialport-stamp/libserialport-configure.rule"
+		},
+		{
+			"file" : "/home/cholito/catkin_ws/build/libserialport_catkin/libserialport-prefix/src/libserialport-stamp/libserialport-build.rule"
+		}
+	],
+	"target" : 
+	{
+		"labels" : 
+		[
+			"libserialport"
+		],
+		"name" : "libserialport"
+	}
+}

@@ -1,0 +1,8 @@
+prefix=/home/cholito/catkin_ws/devel
+
+Name: libserialport_catkin
+Description: Description of libserialport_catkin
+Version: 2.7.4
+Cflags: -I/home/cholito/catkin_ws/devel/include
+Libs: -L${prefix}/lib 
+Requires: 

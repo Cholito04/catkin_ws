@@ -1,0 +1,6 @@
+{
+    "python.analysis.extraPaths": [
+        "./src/map_tf_publisher/scripts/map_to_utm_",
+        "./devel/lib/python3/dist-packages"
+    ]
+}
