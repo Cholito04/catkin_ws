@@ -535,6 +535,7 @@ set(CMAKE_MAKEFILE_OUTPUTS
 set(CMAKE_MAKEFILE_PRODUCTS
   "CTestConfiguration.ini"
   "catkin_generated/stamps/Project/package.xml.stamp"
+<<<<<<< HEAD
   "atomic_configure/_setup_util.py.kiiTT"
   "atomic_configure/env.sh.C6u7s"
   "atomic_configure/setup.bash.Vlvqq"
@@ -546,6 +547,19 @@ set(CMAKE_MAKEFILE_PRODUCTS
   "atomic_configure/setup.fish.qZxbX"
   "atomic_configure/local_setup.fish.c0Gj8"
   "atomic_configure/.rosinstall.Qv4u8"
+=======
+  "atomic_configure/_setup_util.py.GGqdw"
+  "atomic_configure/env.sh.8Tck2"
+  "atomic_configure/setup.bash.pg4Hl"
+  "atomic_configure/local_setup.bash.AWQvd"
+  "atomic_configure/setup.sh.W11Tz"
+  "atomic_configure/local_setup.sh.IU1mP"
+  "atomic_configure/setup.zsh.LtgZj"
+  "atomic_configure/local_setup.zsh.hLCA9"
+  "atomic_configure/setup.fish.FZfIm"
+  "atomic_configure/local_setup.fish.Yo16T"
+  "atomic_configure/.rosinstall.rnc52"
+>>>>>>> 17223b91776a0da043fcf37602be7c587d4adcf0
   "catkin_generated/installspace/_setup_util.py"
   "catkin_generated/stamps/Project/_setup_util.py.stamp"
   "catkin_generated/installspace/env.sh"

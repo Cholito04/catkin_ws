@@ -139,7 +139,11 @@ add_custom_target(_piksi_rtk_msgs_generate_messages_check_deps_${_filename}
 
 get_filename_component(_filename "/home/cholito/catkin_ws/src/ethz_piksi_ros/piksi_rtk_msgs/msg/PositionWithCovarianceStamped.msg" NAME_WE)
 add_custom_target(_piksi_rtk_msgs_generate_messages_check_deps_${_filename}
+<<<<<<< HEAD
   COMMAND ${CATKIN_ENV} ${PYTHON_EXECUTABLE} ${GENMSG_CHECK_DEPS_SCRIPT} "piksi_rtk_msgs" "/home/cholito/catkin_ws/src/ethz_piksi_ros/piksi_rtk_msgs/msg/PositionWithCovarianceStamped.msg" "std_msgs/Header:geometry_msgs/Point:piksi_rtk_msgs/PositionWithCovariance"
+=======
+  COMMAND ${CATKIN_ENV} ${PYTHON_EXECUTABLE} ${GENMSG_CHECK_DEPS_SCRIPT} "piksi_rtk_msgs" "/home/cholito/catkin_ws/src/ethz_piksi_ros/piksi_rtk_msgs/msg/PositionWithCovarianceStamped.msg" "piksi_rtk_msgs/PositionWithCovariance:std_msgs/Header:geometry_msgs/Point"
+>>>>>>> 17223b91776a0da043fcf37602be7c587d4adcf0
 )
 
 get_filename_component(_filename "/home/cholito/catkin_ws/src/ethz_piksi_ros/piksi_rtk_msgs/msg/PosLlh.msg" NAME_WE)
@@ -425,7 +429,11 @@ _generate_msg_cpp(piksi_rtk_msgs
 _generate_msg_cpp(piksi_rtk_msgs
   "/home/cholito/catkin_ws/src/ethz_piksi_ros/piksi_rtk_msgs/msg/PositionWithCovarianceStamped.msg"
   "${MSG_I_FLAGS}"
+<<<<<<< HEAD
   "/opt/ros/noetic/share/std_msgs/cmake/../msg/Header.msg;/opt/ros/noetic/share/geometry_msgs/cmake/../msg/Point.msg;/home/cholito/catkin_ws/src/ethz_piksi_ros/piksi_rtk_msgs/msg/PositionWithCovariance.msg"
+=======
+  "/home/cholito/catkin_ws/src/ethz_piksi_ros/piksi_rtk_msgs/msg/PositionWithCovariance.msg;/opt/ros/noetic/share/std_msgs/cmake/../msg/Header.msg;/opt/ros/noetic/share/geometry_msgs/cmake/../msg/Point.msg"
+>>>>>>> 17223b91776a0da043fcf37602be7c587d4adcf0
   ${CATKIN_DEVEL_PREFIX}/${gencpp_INSTALL_DIR}/piksi_rtk_msgs
 )
 _generate_msg_cpp(piksi_rtk_msgs
@@ -858,7 +866,11 @@ _generate_msg_eus(piksi_rtk_msgs
 _generate_msg_eus(piksi_rtk_msgs
   "/home/cholito/catkin_ws/src/ethz_piksi_ros/piksi_rtk_msgs/msg/PositionWithCovarianceStamped.msg"
   "${MSG_I_FLAGS}"
+<<<<<<< HEAD
   "/opt/ros/noetic/share/std_msgs/cmake/../msg/Header.msg;/opt/ros/noetic/share/geometry_msgs/cmake/../msg/Point.msg;/home/cholito/catkin_ws/src/ethz_piksi_ros/piksi_rtk_msgs/msg/PositionWithCovariance.msg"
+=======
+  "/home/cholito/catkin_ws/src/ethz_piksi_ros/piksi_rtk_msgs/msg/PositionWithCovariance.msg;/opt/ros/noetic/share/std_msgs/cmake/../msg/Header.msg;/opt/ros/noetic/share/geometry_msgs/cmake/../msg/Point.msg"
+>>>>>>> 17223b91776a0da043fcf37602be7c587d4adcf0
   ${CATKIN_DEVEL_PREFIX}/${geneus_INSTALL_DIR}/piksi_rtk_msgs
 )
 _generate_msg_eus(piksi_rtk_msgs
@@ -1291,7 +1303,11 @@ _generate_msg_lisp(piksi_rtk_msgs
 _generate_msg_lisp(piksi_rtk_msgs
   "/home/cholito/catkin_ws/src/ethz_piksi_ros/piksi_rtk_msgs/msg/PositionWithCovarianceStamped.msg"
   "${MSG_I_FLAGS}"
+<<<<<<< HEAD
   "/opt/ros/noetic/share/std_msgs/cmake/../msg/Header.msg;/opt/ros/noetic/share/geometry_msgs/cmake/../msg/Point.msg;/home/cholito/catkin_ws/src/ethz_piksi_ros/piksi_rtk_msgs/msg/PositionWithCovariance.msg"
+=======
+  "/home/cholito/catkin_ws/src/ethz_piksi_ros/piksi_rtk_msgs/msg/PositionWithCovariance.msg;/opt/ros/noetic/share/std_msgs/cmake/../msg/Header.msg;/opt/ros/noetic/share/geometry_msgs/cmake/../msg/Point.msg"
+>>>>>>> 17223b91776a0da043fcf37602be7c587d4adcf0
   ${CATKIN_DEVEL_PREFIX}/${genlisp_INSTALL_DIR}/piksi_rtk_msgs
 )
 _generate_msg_lisp(piksi_rtk_msgs
@@ -1724,7 +1740,11 @@ _generate_msg_nodejs(piksi_rtk_msgs
 _generate_msg_nodejs(piksi_rtk_msgs
   "/home/cholito/catkin_ws/src/ethz_piksi_ros/piksi_rtk_msgs/msg/PositionWithCovarianceStamped.msg"
   "${MSG_I_FLAGS}"
+<<<<<<< HEAD
   "/opt/ros/noetic/share/std_msgs/cmake/../msg/Header.msg;/opt/ros/noetic/share/geometry_msgs/cmake/../msg/Point.msg;/home/cholito/catkin_ws/src/ethz_piksi_ros/piksi_rtk_msgs/msg/PositionWithCovariance.msg"
+=======
+  "/home/cholito/catkin_ws/src/ethz_piksi_ros/piksi_rtk_msgs/msg/PositionWithCovariance.msg;/opt/ros/noetic/share/std_msgs/cmake/../msg/Header.msg;/opt/ros/noetic/share/geometry_msgs/cmake/../msg/Point.msg"
+>>>>>>> 17223b91776a0da043fcf37602be7c587d4adcf0
   ${CATKIN_DEVEL_PREFIX}/${gennodejs_INSTALL_DIR}/piksi_rtk_msgs
 )
 _generate_msg_nodejs(piksi_rtk_msgs
@@ -2157,7 +2177,11 @@ _generate_msg_py(piksi_rtk_msgs
 _generate_msg_py(piksi_rtk_msgs
   "/home/cholito/catkin_ws/src/ethz_piksi_ros/piksi_rtk_msgs/msg/PositionWithCovarianceStamped.msg"
   "${MSG_I_FLAGS}"
+<<<<<<< HEAD
   "/opt/ros/noetic/share/std_msgs/cmake/../msg/Header.msg;/opt/ros/noetic/share/geometry_msgs/cmake/../msg/Point.msg;/home/cholito/catkin_ws/src/ethz_piksi_ros/piksi_rtk_msgs/msg/PositionWithCovariance.msg"
+=======
+  "/home/cholito/catkin_ws/src/ethz_piksi_ros/piksi_rtk_msgs/msg/PositionWithCovariance.msg;/opt/ros/noetic/share/std_msgs/cmake/../msg/Header.msg;/opt/ros/noetic/share/geometry_msgs/cmake/../msg/Point.msg"
+>>>>>>> 17223b91776a0da043fcf37602be7c587d4adcf0
   ${CATKIN_DEVEL_PREFIX}/${genpy_INSTALL_DIR}/piksi_rtk_msgs
 )
 _generate_msg_py(piksi_rtk_msgs

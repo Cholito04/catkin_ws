@@ -253,9 +253,15 @@ ethz_piksi_ros/piksi_rtk_msgs/CMakeFiles/piksi_rtk_msgs_generate_messages_py: /h
 
 /home/cholito/catkin_ws/devel/lib/python3/dist-packages/piksi_rtk_msgs/msg/_PositionWithCovarianceStamped.py: /opt/ros/noetic/lib/genpy/genmsg_py.py
 /home/cholito/catkin_ws/devel/lib/python3/dist-packages/piksi_rtk_msgs/msg/_PositionWithCovarianceStamped.py: /home/cholito/catkin_ws/src/ethz_piksi_ros/piksi_rtk_msgs/msg/PositionWithCovarianceStamped.msg
+<<<<<<< HEAD
 /home/cholito/catkin_ws/devel/lib/python3/dist-packages/piksi_rtk_msgs/msg/_PositionWithCovarianceStamped.py: /opt/ros/noetic/share/std_msgs/msg/Header.msg
 /home/cholito/catkin_ws/devel/lib/python3/dist-packages/piksi_rtk_msgs/msg/_PositionWithCovarianceStamped.py: /opt/ros/noetic/share/geometry_msgs/msg/Point.msg
 /home/cholito/catkin_ws/devel/lib/python3/dist-packages/piksi_rtk_msgs/msg/_PositionWithCovarianceStamped.py: /home/cholito/catkin_ws/src/ethz_piksi_ros/piksi_rtk_msgs/msg/PositionWithCovariance.msg
+=======
+/home/cholito/catkin_ws/devel/lib/python3/dist-packages/piksi_rtk_msgs/msg/_PositionWithCovarianceStamped.py: /home/cholito/catkin_ws/src/ethz_piksi_ros/piksi_rtk_msgs/msg/PositionWithCovariance.msg
+/home/cholito/catkin_ws/devel/lib/python3/dist-packages/piksi_rtk_msgs/msg/_PositionWithCovarianceStamped.py: /opt/ros/noetic/share/std_msgs/msg/Header.msg
+/home/cholito/catkin_ws/devel/lib/python3/dist-packages/piksi_rtk_msgs/msg/_PositionWithCovarianceStamped.py: /opt/ros/noetic/share/geometry_msgs/msg/Point.msg
+>>>>>>> 17223b91776a0da043fcf37602be7c587d4adcf0
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --blue --bold --progress-dir=/home/cholito/catkin_ws/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_25) "Generating Python from MSG piksi_rtk_msgs/PositionWithCovarianceStamped"
 	cd /home/cholito/catkin_ws/build/ethz_piksi_ros/piksi_rtk_msgs && ../../catkin_generated/env_cached.sh /usr/bin/python3 /opt/ros/noetic/share/genpy/cmake/../../../lib/genpy/genmsg_py.py /home/cholito/catkin_ws/src/ethz_piksi_ros/piksi_rtk_msgs/msg/PositionWithCovarianceStamped.msg -Ipiksi_rtk_msgs:/home/cholito/catkin_ws/src/ethz_piksi_ros/piksi_rtk_msgs/msg -Istd_msgs:/opt/ros/noetic/share/std_msgs/cmake/../msg -Igeometry_msgs:/opt/ros/noetic/share/geometry_msgs/cmake/../msg -Isensor_msgs:/opt/ros/noetic/share/sensor_msgs/cmake/../msg -p piksi_rtk_msgs -o /home/cholito/catkin_ws/devel/lib/python3/dist-packages/piksi_rtk_msgs/msg
 

@@ -1,6 +1,10 @@
 import * as THREE from 'three';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+<<<<<<< HEAD
 import {TDSLoader} from "three/addons/loaders/TDSLoader.js"
+=======
+import {STLLoader} from "three/addons/loaders/STLLoader.js"
+>>>>>>> 17223b91776a0da043fcf37602be7c587d4adcf0
 
 // base class
 class Drawable {
@@ -133,6 +137,13 @@ class Renderer3d {
             debug: new THREE.Group()
         };
 
+<<<<<<< HEAD
+=======
+        this.controls.addEventListener('start', () => {
+            this.follow = false;
+        });
+
+>>>>>>> 17223b91776a0da043fcf37602be7c587d4adcf0
         Object.values(this.layers).forEach(g => this.world.add(g));
 
         //set ground plane
@@ -188,6 +199,7 @@ class Renderer3d {
 
     updateCamera() {
         if (!this.follow) return;
+<<<<<<< HEAD
         const v = this.drawables.find(d => d instanceof VehicleEntity);
         if (!v?.pose) return;
 
@@ -199,6 +211,38 @@ class Renderer3d {
         this.controls.target.lerp(target, 0.1);
     }
 
+=======
+
+        const v = this.drawables.find(d => d instanceof VehicleEntity);
+        if (!v?.pose) return;
+
+        const { x, y, yaw } = v.pose;
+
+        // Vehicle forward direction in 2D → convert to Three.js (z = -2D y)
+        const forwardX = Math.cos(yaw);     // +X in world
+        const forwardZ = -Math.sin(yaw);    // +Z in Three.js = -2D Y direction
+
+        const distanceBehind = 8;
+        const height = 3;
+        const lookAhead = 8;
+
+        const idealPos = new THREE.Vector3(
+            x - forwardX * distanceBehind,
+            height,
+            -y - forwardZ * distanceBehind   // note the signs
+        );
+
+        const idealTarget = new THREE.Vector3(
+            x + forwardX * lookAhead,
+            1.5,
+            -y + forwardZ * lookAhead
+        );
+
+        // smooth follow
+        this.camera.position.lerp(idealPos, 0.12);
+        this.controls.target.lerp(idealTarget, 0.18);
+    }
+>>>>>>> 17223b91776a0da043fcf37602be7c587d4adcf0
     render(time) {
         if (!this.running) return;
         
@@ -312,7 +356,11 @@ class VehicleEntity extends Drawable {
         //fake motion state
         this.t = 0;
         this.radius = 25;
+<<<<<<< HEAD
         this.angularSpeed = 0.4;
+=======
+        this.angularSpeed = 0.0;
+>>>>>>> 17223b91776a0da043fcf37602be7c587d4adcf0
     }
 
     onAdd(renderer) {
@@ -321,6 +369,7 @@ class VehicleEntity extends Drawable {
         this.vGroup = new THREE.Group();
         renderer.layers.vehicles.add(this.vGroup);
 
+<<<<<<< HEAD
         const loader = new TDSLoader();
         loader.setResourcePath("./models/"); //textures folder
         loader.setPath("./models/")
@@ -337,11 +386,66 @@ class VehicleEntity extends Drawable {
         if (this.mesh && this.pose) {
             this.mesh.position.set(this.pose.x, 0.5, -this.pose.y);
             this.mesh.rotation.y = this.pose.yaw;
+=======
+        const loader = new STLLoader();
+        loader.load("./models/Transit_2.stl", geometry => {
+            // STLLoader returns geometry, not an object
+            const material = new THREE.MeshStandardMaterial({ 
+                color: 0x4444ff,
+                roughness: 0.5,
+                metalness: 0.3
+            });
+            const mesh = new THREE.Mesh(geometry, material);
+
+                // get raw model dimensions before any scaling
+            const box = new THREE.Box3().setFromObject(mesh);
+            const size = box.getSize(new THREE.Vector3());
+            console.log("Raw model size:", size);
+
+
+            const TARGET_WIDTH = 2.5; // meters match lane width
+            const scale = TARGET_WIDTH / size.x; // scale based on model's width axis
+            mesh.scale.set(scale, scale, scale);
+            mesh.rotation.set(0, 0, 0); 
+            
+            // re-center after scaling
+            const scaledBox = new THREE.Box3().setFromObject(mesh);
+            const center = scaledBox.getCenter(new THREE.Vector3());
+            mesh.position.set(-center.x, -scaledBox.min.y, -center.z);
+
+            this.mesh = new THREE.Group();
+            this.mesh.add(mesh);
+            this.vGroup.add(this.mesh);
+
+        },
+        xhr => console.log(`Model: ${(xhr.loaded / xhr.total * 100).toFixed(1)}% loaded`),
+        err => console.error("STL load error:", err)
+        );
+    }
+
+    update(dt) {
+        this.t += dt * this.angularSpeed;
+        const x = Math.cos(this.t) * this.radius;
+        const y = Math.sin(this.t) * this.radius;
+
+        // compute yaw from actual movement direction
+        if (this.pose) {
+            const dx = x - this.pose.x;
+            const dy = y - this.pose.y;
+            if (Math.abs(dx) > 0.001 || Math.abs(dy) > 0.001) {
+                this.pose = { x, y, yaw: Math.atan2(dy, dx) };
+            } else {
+                this.pose = { x, y, yaw: this.pose.yaw };
+            }
+        } else {
+            this.pose = { x, y, yaw: 0 };
+>>>>>>> 17223b91776a0da043fcf37602be7c587d4adcf0
         }
     }
 
     draw2D(renderer) {
         if (!this.pose) return;
+<<<<<<< HEAD
 
         const { x, y, yaw } = this.pose;
         const s = renderer.worldToScreen(x, y);
@@ -356,6 +460,37 @@ class VehicleEntity extends Drawable {
         ctx.moveTo(12, 0);
         ctx.lineTo(-10, -6);
         ctx.lineTo(-10, 6);
+=======
+        const { x, y, yaw } = this.pose;
+        const s = renderer.worldToScreen(x, y);
+        const ctx = renderer.ctx;
+
+        ctx.save();
+        ctx.translate(s.x, s.y);
+
+        // outer blue circle
+        ctx.beginPath();
+        ctx.arc(0, 0, 14, 0, Math.PI * 2);
+        ctx.fillStyle = "rgba(0, 122, 255, 0.2)";
+        ctx.fill();
+
+        // inner filled blue circle
+        ctx.beginPath();
+        ctx.arc(0, 0, 9, 0, Math.PI * 2);
+        ctx.fillStyle = "#007AFF";
+        ctx.fill();
+        ctx.strokeStyle = "#ffffff";
+        ctx.lineWidth = 2;
+        ctx.stroke();
+
+        // direction arrow — rotated by yaw
+        ctx.rotate(-yaw);
+        ctx.fillStyle = "#ffffff";
+        ctx.beginPath();
+        ctx.moveTo(0, -14);   // tip
+        ctx.lineTo(-5, -6);   // left base
+        ctx.lineTo(5, -6);    // right base
+>>>>>>> 17223b91776a0da043fcf37602be7c587d4adcf0
         ctx.closePath();
         ctx.fill();
 
@@ -363,11 +498,22 @@ class VehicleEntity extends Drawable {
     }
 
     draw3D(renderer){
+<<<<<<< HEAD
         if (!this.mesh || !this.pose) return;
 
             const { x, y, yaw } = this.pose;
             this.mesh.position.set(x, 0.5, -y);
             this.mesh.rotation.y = yaw;
+=======
+    if (!this.vGroup || !this.pose) return;
+    const { x, y, yaw } = this.pose;
+    this.vGroup.position.set(x, 0, -y);
+    this.vGroup.rotation.y = yaw + Math.PI / 2;
+    if (!this.axesHelper) {
+        this.axesHelper = new THREE.AxesHelper(8); // red = +X local, green = +Y up, blue = +Z local
+        this.vGroup.add(this.axesHelper);
+    }
+>>>>>>> 17223b91776a0da043fcf37602be7c587d4adcf0
                 
     }
 }
@@ -515,6 +661,11 @@ document.getElementById("toggleView").addEventListener("click", () => {
         renderer3d.camera.position.set(mapCenter.x, 30, -mapCenter.y + 50);
         renderer3d.camera.lookAt(mapCenter.x, 0, -mapCenter.y);
         document.getElementById("toggleView").innerText = "Switch to 2D";
+<<<<<<< HEAD
+=======
+        document.getElementById("controls-2d").style.display = "none";
+        document.getElementById("controls-3d").style.display = "inline";
+>>>>>>> 17223b91776a0da043fcf37602be7c587d4adcf0
     } else {
         canvas.style.display = "block";
         renderer3d.stop();
@@ -522,7 +673,12 @@ document.getElementById("toggleView").addEventListener("click", () => {
         
         renderer.start();
         document.getElementById("toggleView").innerText = "Switch to 3D";
+<<<<<<< HEAD
         
+=======
+        document.getElementById("controls-2d").style.display = "inline";
+        document.getElementById("controls-3d").style.display = "none";
+>>>>>>> 17223b91776a0da043fcf37602be7c587d4adcf0
     }
 });
 
@@ -593,6 +749,10 @@ canvas.addEventListener("wheel", e => {
 window.addEventListener("keydown", e => {
     if (e.key === "f") {
         renderer.camera.follow = true;
+<<<<<<< HEAD
+=======
+        renderer3d.follow = true;
+>>>>>>> 17223b91776a0da043fcf37602be7c587d4adcf0
     }
 });
 
@@ -665,7 +825,11 @@ document.getElementById("startSelect")?.addEventListener("change", updateSelecti
 document.getElementById("goalSelect")?.addEventListener("change", updateSelection);
 
 // Compute route button — calls /route and draws waypoints
+<<<<<<< HEAD
 // ---- ROUTING INTERFACE: response comes from your teammate's algo ----
+=======
+// ---- ROUTING INTERFACE: ----
+>>>>>>> 17223b91776a0da043fcf37602be7c587d4adcf0
 document.getElementById("computeRoute")?.addEventListener("click", () => {
     const start = document.getElementById("startSelect").value;
     const goal  = document.getElementById("goalSelect").value;

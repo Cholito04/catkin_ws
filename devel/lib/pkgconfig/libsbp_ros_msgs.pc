@@ -1,0 +1,8 @@
+prefix=/home/cholito/catkin_ws/devel
+
+Name: libsbp_ros_msgs
+Description: Description of libsbp_ros_msgs
+Version: 0.0.0
+Cflags: -I/home/cholito/catkin_ws/src/ethz_piksi_ros/libsbp_ros_msgs/include
+Libs: -L${prefix}/lib -llibsbp_ros_msgs
+Requires: libsbp_catkin message_generation message_runtime
