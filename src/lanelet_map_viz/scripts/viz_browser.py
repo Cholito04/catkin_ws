@@ -108,12 +108,36 @@ class DataHandler(SimpleHTTPRequestHandler):
             goal_stop = stops_data[body["goal"]]
             
 
+<<<<<<< HEAD
+<<<<<<< HEAD
+            start_ll = get_lanelet_by_id(llmap_global, start_stop["lanelet_id"])
+            goal_ll  = get_lanelet_by_id(llmap_global, goal_stop["lanelet_id"])
+
+            route_pts = None
+            if start_ll is not None and goal_ll is not None:
+                route_pts = compute_centerline_route_points(start_ll, goal_ll)
+
+            # fallback: straight line if routing fails
+            if not route_pts:
+                route_pts = [start_stop["centerline_point"], goal_stop["centerline_point"]]
+
+            self.send_response(200)
+            self.send_header('Content-Type', 'application/json')
+            self.end_headers()
+            self.wfile.write(json.dumps({"waypoints": route_pts}).encode())
+=======
+=======
+>>>>>>> 17223b91776a0da043fcf37602be7c587d4adcf0
             waypoints = [start_stop["centerline_point"], goal_stop["centerline_point"]]
             
             self.send_response(200)
             self.send_header('Content-Type', 'application/json')
             self.end_headers()
             self.wfile.write(json.dumps(waypoints).encode()) 
+<<<<<<< HEAD
+>>>>>>> 17223b91776a0da043fcf37602be7c587d4adcf0
+=======
+>>>>>>> 17223b91776a0da043fcf37602be7c587d4adcf0
         else:
             super().do_POST()
 
@@ -127,6 +151,14 @@ def find_free_port():
 def pose_callback(msg):
     global vehicle_pose
 
+<<<<<<< HEAD
+<<<<<<< HEAD
+    pose = msg.pose.pose
+
+=======
+>>>>>>> 17223b91776a0da043fcf37602be7c587d4adcf0
+=======
+>>>>>>> 17223b91776a0da043fcf37602be7c587d4adcf0
     q = msg.pose.orientation
     yaw = euler_from_quaternion([q.x, q.y, q.z, q.w])[2]
 
