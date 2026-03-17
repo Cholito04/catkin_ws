@@ -7,4 +7,5 @@
 # new environment variables
 
 # modified environment variables
+export PATH="/home/cholito/catkin_ws/devel/bin:$PATH"
 export PWD='/home/cholito/catkin_ws/build'

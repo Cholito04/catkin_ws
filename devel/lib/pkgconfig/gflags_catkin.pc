@@ -1,0 +1,8 @@
+prefix=/home/cholito/catkin_ws/devel
+
+Name: gflags_catkin
+Description: Description of gflags_catkin
+Version: 2.2.1
+Cflags: -I/home/cholito/catkin_ws/devel/include
+Libs: -L${prefix}/lib -lgflags
+Requires: 

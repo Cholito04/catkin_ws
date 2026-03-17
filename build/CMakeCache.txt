@@ -362,6 +362,12 @@ EMPY_SCRIPT:STRING=/usr/lib/python3/dist-packages/em.py
 //The directory containing a CMake configuration file for Eigen3.
 Eigen3_DIR:PATH=/usr/lib/cmake/eigen3
 
+//Path to a file.
+GLOG_INCLUDE_DIR:PATH=/usr/include
+
+//Path to a library.
+GLOG_LIBRARY:FILEPATH=/usr/lib/x86_64-linux-gnu/libglog.so
+
 //Path to a library.
 GMOCK_LIBRARY:FILEPATH=GMOCK_LIBRARY-NOTFOUND
 
@@ -609,11 +615,26 @@ campus_shuttle_mapping_SOURCE_DIR:STATIC=/home/cholito/catkin_ws/src/campus_shut
 //The directory containing a CMake configuration file for catkin.
 catkin_DIR:PATH=/opt/ros/noetic/share/catkin/cmake
 
+//Value Computed by CMake
+catkin_simple_BINARY_DIR:STATIC=/home/cholito/catkin_ws/build/catkin_simple
+
+//The directory containing a CMake configuration file for catkin_simple.
+catkin_simple_DIR:PATH=/home/cholito/catkin_ws/devel/share/catkin_simple/cmake
+
+//Value Computed by CMake
+catkin_simple_SOURCE_DIR:STATIC=/home/cholito/catkin_ws/src/catkin_simple
+
 //The directory containing a CMake configuration file for class_loader.
 class_loader_DIR:PATH=/opt/ros/noetic/share/class_loader/cmake
 
 //The directory containing a CMake configuration file for cpp_common.
 cpp_common_DIR:PATH=/opt/ros/noetic/share/cpp_common/cmake
+
+//Value Computed by CMake
+ethz_piksi_ros_BINARY_DIR:STATIC=/home/cholito/catkin_ws/build/ethz_piksi_ros/ethz_piksi_ros
+
+//Value Computed by CMake
+ethz_piksi_ros_SOURCE_DIR:STATIC=/home/cholito/catkin_ws/src/ethz_piksi_ros/ethz_piksi_ros
 
 //The directory containing a CMake configuration file for gencpp.
 gencpp_DIR:PATH=/opt/ros/noetic/share/gencpp/cmake
@@ -635,6 +656,24 @@ genpy_DIR:PATH=/opt/ros/noetic/share/genpy/cmake
 
 //The directory containing a CMake configuration file for geometry_msgs.
 geometry_msgs_DIR:PATH=/opt/ros/noetic/share/geometry_msgs/cmake
+
+//Value Computed by CMake
+gflags_catkin_BINARY_DIR:STATIC=/home/cholito/catkin_ws/build/gflags_catkin
+
+//The directory containing a CMake configuration file for gflags_catkin.
+gflags_catkin_DIR:PATH=/home/cholito/catkin_ws/devel/share/gflags_catkin/cmake
+
+//Value Computed by CMake
+gflags_catkin_SOURCE_DIR:STATIC=/home/cholito/catkin_ws/src/gflags_catkin
+
+//The directory containing a CMake configuration file for glog.
+glog_DIR:PATH=glog_DIR-NOTFOUND
+
+//Value Computed by CMake
+glog_catkin_BINARY_DIR:STATIC=/home/cholito/catkin_ws/build/glog_catkin
+
+//Value Computed by CMake
+glog_catkin_SOURCE_DIR:STATIC=/home/cholito/catkin_ws/src/glog_catkin
 
 //Value Computed by CMake
 gmock_BINARY_DIR:STATIC=/home/cholito/catkin_ws/build/gtest/googlemock
@@ -856,6 +895,9 @@ laser_geometry_DIR:PATH=/opt/ros/noetic/share/laser_geometry/cmake
 //Path to a library.
 lib:FILEPATH=/opt/ros/noetic/lib/libtf2.so
 
+//The directory containing a CMake configuration file for libgoogle-glog-dev.
+libgoogle-glog-dev_DIR:PATH=libgoogle-glog-dev_DIR-NOTFOUND
+
 //The directory containing a CMake configuration file for map_msgs.
 map_msgs_DIR:PATH=/opt/ros/noetic/share/map_msgs/cmake
 
@@ -883,11 +925,44 @@ nav_msgs_DIR:PATH=/opt/ros/noetic/share/nav_msgs/cmake
 //The directory containing a CMake configuration file for nodelet.
 nodelet_DIR:PATH=/opt/ros/noetic/share/nodelet/cmake
 
+//Value Computed by CMake
+piksi_multi_rtk_ros_BINARY_DIR:STATIC=/home/cholito/catkin_ws/build/ethz_piksi_ros/piksi_multi_rtk_ros
+
+//Value Computed by CMake
+piksi_multi_rtk_ros_SOURCE_DIR:STATIC=/home/cholito/catkin_ws/src/ethz_piksi_ros/piksi_multi_rtk_ros
+
+//Value Computed by CMake
+piksi_pps_sync_BINARY_DIR:STATIC=/home/cholito/catkin_ws/build/ethz_piksi_ros/piksi_pps_sync
+
+//Value Computed by CMake
+piksi_pps_sync_SOURCE_DIR:STATIC=/home/cholito/catkin_ws/src/ethz_piksi_ros/piksi_pps_sync
+
+//Value Computed by CMake
+piksi_rtk_kml_BINARY_DIR:STATIC=/home/cholito/catkin_ws/build/ethz_piksi_ros/piksi_rtk_kml
+
+//Value Computed by CMake
+piksi_rtk_kml_SOURCE_DIR:STATIC=/home/cholito/catkin_ws/src/ethz_piksi_ros/piksi_rtk_kml
+
+//Value Computed by CMake
+piksi_rtk_msgs_BINARY_DIR:STATIC=/home/cholito/catkin_ws/build/ethz_piksi_ros/piksi_rtk_msgs
+
+//The directory containing a CMake configuration file for piksi_rtk_msgs.
+piksi_rtk_msgs_DIR:PATH=/home/cholito/catkin_ws/devel/share/piksi_rtk_msgs/cmake
+
+//Value Computed by CMake
+piksi_rtk_msgs_SOURCE_DIR:STATIC=/home/cholito/catkin_ws/src/ethz_piksi_ros/piksi_rtk_msgs
+
 //The directory containing a CMake configuration file for pluginlib.
 pluginlib_DIR:PATH=/opt/ros/noetic/share/pluginlib/cmake
 
 //The directory containing a CMake configuration file for resource_retriever.
 resource_retriever_DIR:PATH=/opt/ros/noetic/share/resource_retriever/cmake
+
+//The directory containing a CMake configuration file for rosbag.
+rosbag_DIR:PATH=/opt/ros/noetic/share/rosbag/cmake
+
+//The directory containing a CMake configuration file for rosbag_storage.
+rosbag_storage_DIR:PATH=/opt/ros/noetic/share/rosbag_storage/cmake
 
 //The directory containing a CMake configuration file for rosconsole.
 rosconsole_DIR:PATH=/opt/ros/noetic/share/rosconsole/cmake
@@ -912,6 +987,9 @@ rosgraph_msgs_DIR:PATH=/opt/ros/noetic/share/rosgraph_msgs/cmake
 
 //The directory containing a CMake configuration file for roslib.
 roslib_DIR:PATH=/opt/ros/noetic/share/roslib/cmake
+
+//The directory containing a CMake configuration file for roslz4.
+roslz4_DIR:PATH=/opt/ros/noetic/share/roslz4/cmake
 
 //The directory containing a CMake configuration file for rospack.
 rospack_DIR:PATH=/opt/ros/noetic/share/rospack/cmake
@@ -954,6 +1032,9 @@ tf2_ros_DIR:PATH=/opt/ros/noetic/share/tf2_ros/cmake
 
 //The directory containing a CMake configuration file for tf.
 tf_DIR:PATH=/opt/ros/noetic/share/tf/cmake
+
+//The directory containing a CMake configuration file for topic_tools.
+topic_tools_DIR:PATH=/opt/ros/noetic/share/topic_tools/cmake
 
 //The directory containing a CMake configuration file for urdf.
 urdf_DIR:PATH=/opt/ros/noetic/share/urdf/cmake
@@ -1126,7 +1207,7 @@ CMAKE_MODULE_LINKER_FLAGS_RELWITHDEBINFO-ADVANCED:INTERNAL=1
 //ADVANCED property for variable: CMAKE_NM
 CMAKE_NM-ADVANCED:INTERNAL=1
 //number of local generators
-CMAKE_NUMBER_OF_MAKEFILES:INTERNAL=18
+CMAKE_NUMBER_OF_MAKEFILES:INTERNAL=26
 //ADVANCED property for variable: CMAKE_OBJCOPY
 CMAKE_OBJCOPY-ADVANCED:INTERNAL=1
 //ADVANCED property for variable: CMAKE_OBJDUMP
@@ -1175,6 +1256,8 @@ FIND_PACKAGE_MESSAGE_DETAILS_Boost:INTERNAL=[/usr/lib/x86_64-linux-gnu/cmake/Boo
 FIND_PACKAGE_MESSAGE_DETAILS_BoostPython:INTERNAL=[Boost::python;Boost::numpy;/usr/lib/x86_64-linux-gnu/libpython3.8.so][/usr/include;/usr/include/python3.8][v()]
 //Details about finding GeographicLib
 FIND_PACKAGE_MESSAGE_DETAILS_GeographicLib:INTERNAL=[/usr/lib/x86_64-linux-gnu/libGeographic.so][/usr/include][v()]
+//Details about finding Glog
+FIND_PACKAGE_MESSAGE_DETAILS_Glog:INTERNAL=[/usr/include][/usr/lib/x86_64-linux-gnu/libglog.so][v()]
 //Details about finding OpenMP
 FIND_PACKAGE_MESSAGE_DETAILS_OpenMP:INTERNAL=[TRUE][TRUE][c ][v()]
 //Details about finding OpenMP_C
@@ -1193,6 +1276,10 @@ FIND_PACKAGE_MESSAGE_DETAILS_PythonInterp:INTERNAL=[/usr/bin/python3][v3.8.10()]
 FIND_PACKAGE_MESSAGE_DETAILS_Threads:INTERNAL=[TRUE][v()]
 //Details about finding pugixml
 FIND_PACKAGE_MESSAGE_DETAILS_pugixml:INTERNAL=[/usr/lib/x86_64-linux-gnu/libpugixml.so][/usr/include][v()]
+//ADVANCED property for variable: GLOG_INCLUDE_DIR
+GLOG_INCLUDE_DIR-ADVANCED:INTERNAL=1
+//ADVANCED property for variable: GLOG_LIBRARY
+GLOG_LIBRARY-ADVANCED:INTERNAL=1
 GMOCK_FROM_SOURCE_FOUND:INTERNAL=TRUE
 GMOCK_FROM_SOURCE_INCLUDE_DIRS:INTERNAL=/usr/src/googletest/googlemock/include
 GMOCK_FROM_SOURCE_LIBRARIES:INTERNAL=gmock
@@ -1267,6 +1354,8 @@ ProcessorCount_cmd_sysctl-ADVANCED:INTERNAL=1
 Python3_LIBRARY_DEBUG-ADVANCED:INTERNAL=1
 //ADVANCED property for variable: Python3_LIBRARY_RELEASE
 Python3_LIBRARY_RELEASE-ADVANCED:INTERNAL=1
+//Whether to use the system version of Glog.
+USE_SYSTEM_GLOG:INTERNAL=AUTO
 //CMAKE_INSTALL_PREFIX during last run
 _GNUInstallDirs_LAST_CMAKE_INSTALL_PREFIX:INTERNAL=/home/cholito/catkin_ws/install
 //ADVANCED property for variable: _Python3_DEVELOPMENT_SIGNATURE
@@ -1328,6 +1417,8 @@ boost_unit_test_framework_DIR-ADVANCED:INTERNAL=1
 boost_wave_DIR-ADVANCED:INTERNAL=1
 //ADVANCED property for variable: boost_wserialization_DIR
 boost_wserialization_DIR-ADVANCED:INTERNAL=1
+//ADVANCED property for variable: glog_DIR
+glog_DIR-ADVANCED:INTERNAL=1
 //ADVANCED property for variable: gmock_build_tests
 gmock_build_tests-ADVANCED:INTERNAL=1
 //ADVANCED property for variable: gtest_build_samples
