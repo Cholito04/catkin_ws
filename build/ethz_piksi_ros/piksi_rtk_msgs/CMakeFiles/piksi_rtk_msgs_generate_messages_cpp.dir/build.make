@@ -276,9 +276,15 @@ ethz_piksi_ros/piksi_rtk_msgs/CMakeFiles/piksi_rtk_msgs_generate_messages_cpp: /
 /home/cholito/catkin_ws/devel/include/piksi_rtk_msgs/PositionWithCovarianceStamped.h: /opt/ros/noetic/lib/gencpp/gen_cpp.py
 /home/cholito/catkin_ws/devel/include/piksi_rtk_msgs/PositionWithCovarianceStamped.h: /home/cholito/catkin_ws/src/ethz_piksi_ros/piksi_rtk_msgs/msg/PositionWithCovarianceStamped.msg
 <<<<<<< HEAD
+<<<<<<< HEAD
 /home/cholito/catkin_ws/devel/include/piksi_rtk_msgs/PositionWithCovarianceStamped.h: /opt/ros/noetic/share/std_msgs/msg/Header.msg
 /home/cholito/catkin_ws/devel/include/piksi_rtk_msgs/PositionWithCovarianceStamped.h: /opt/ros/noetic/share/geometry_msgs/msg/Point.msg
 /home/cholito/catkin_ws/devel/include/piksi_rtk_msgs/PositionWithCovarianceStamped.h: /home/cholito/catkin_ws/src/ethz_piksi_ros/piksi_rtk_msgs/msg/PositionWithCovariance.msg
+=======
+/home/cholito/catkin_ws/devel/include/piksi_rtk_msgs/PositionWithCovarianceStamped.h: /home/cholito/catkin_ws/src/ethz_piksi_ros/piksi_rtk_msgs/msg/PositionWithCovariance.msg
+/home/cholito/catkin_ws/devel/include/piksi_rtk_msgs/PositionWithCovarianceStamped.h: /opt/ros/noetic/share/std_msgs/msg/Header.msg
+/home/cholito/catkin_ws/devel/include/piksi_rtk_msgs/PositionWithCovarianceStamped.h: /opt/ros/noetic/share/geometry_msgs/msg/Point.msg
+>>>>>>> 17223b91776a0da043fcf37602be7c587d4adcf0
 =======
 /home/cholito/catkin_ws/devel/include/piksi_rtk_msgs/PositionWithCovarianceStamped.h: /home/cholito/catkin_ws/src/ethz_piksi_ros/piksi_rtk_msgs/msg/PositionWithCovariance.msg
 /home/cholito/catkin_ws/devel/include/piksi_rtk_msgs/PositionWithCovarianceStamped.h: /opt/ros/noetic/share/std_msgs/msg/Header.msg
