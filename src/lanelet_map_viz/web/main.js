@@ -1,6 +1,14 @@
 import * as THREE from 'three';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+<<<<<<< HEAD
+<<<<<<< HEAD
+import {TDSLoader} from "three/addons/loaders/TDSLoader.js"
+=======
 import {STLLoader} from "three/addons/loaders/STLLoader.js"
+>>>>>>> 17223b91776a0da043fcf37602be7c587d4adcf0
+=======
+import {STLLoader} from "three/addons/loaders/STLLoader.js"
+>>>>>>> 17223b91776a0da043fcf37602be7c587d4adcf0
 
 // base class
 class Drawable {
@@ -133,10 +141,19 @@ class Renderer3d {
             debug: new THREE.Group()
         };
 
+<<<<<<< HEAD
+<<<<<<< HEAD
+=======
+=======
+>>>>>>> 17223b91776a0da043fcf37602be7c587d4adcf0
         this.controls.addEventListener('start', () => {
             this.follow = false;
         });
 
+<<<<<<< HEAD
+>>>>>>> 17223b91776a0da043fcf37602be7c587d4adcf0
+=======
+>>>>>>> 17223b91776a0da043fcf37602be7c587d4adcf0
         Object.values(this.layers).forEach(g => this.world.add(g));
 
         //set ground plane
@@ -192,6 +209,22 @@ class Renderer3d {
 
     updateCamera() {
         if (!this.follow) return;
+<<<<<<< HEAD
+<<<<<<< HEAD
+        const v = this.drawables.find(d => d instanceof VehicleEntity);
+        if (!v?.pose) return;
+
+        const target = new THREE.Vector3(v.pose.x, 9, -v.pose.y);
+        this.camera.position.lerp(
+            target.clone().add(new THREE.Vector3(0, 20, 50)),
+            0.1
+        );
+        this.controls.target.lerp(target, 0.1);
+    }
+
+=======
+=======
+>>>>>>> 17223b91776a0da043fcf37602be7c587d4adcf0
 
         const v = this.drawables.find(d => d instanceof VehicleEntity);
         if (!v?.pose) return;
@@ -222,6 +255,10 @@ class Renderer3d {
         this.camera.position.lerp(idealPos, 0.12);
         this.controls.target.lerp(idealTarget, 0.18);
     }
+<<<<<<< HEAD
+>>>>>>> 17223b91776a0da043fcf37602be7c587d4adcf0
+=======
+>>>>>>> 17223b91776a0da043fcf37602be7c587d4adcf0
     render(time) {
         if (!this.running) return;
         
@@ -335,7 +372,15 @@ class VehicleEntity extends Drawable {
         //fake motion state
         this.t = 0;
         this.radius = 25;
+<<<<<<< HEAD
+<<<<<<< HEAD
+        this.angularSpeed = 0.4;
+=======
         this.angularSpeed = 0.0;
+>>>>>>> 17223b91776a0da043fcf37602be7c587d4adcf0
+=======
+        this.angularSpeed = 0.0;
+>>>>>>> 17223b91776a0da043fcf37602be7c587d4adcf0
     }
 
     onAdd(renderer) {
@@ -344,6 +389,27 @@ class VehicleEntity extends Drawable {
         this.vGroup = new THREE.Group();
         renderer.layers.vehicles.add(this.vGroup);
 
+<<<<<<< HEAD
+<<<<<<< HEAD
+        const loader = new TDSLoader();
+        loader.setResourcePath("./models/"); //textures folder
+        loader.setPath("./models/")
+
+        loader.load("Toyota Supra JZA80 Mark4 1994.3ds", object => {
+        object.scale.set(0.01, 0.01, 0.01);
+        object.rotation.x = -Math.PI / 2;
+        this.mesh = object;
+        this.vGroup.add(this.mesh);
+        });
+    }
+
+    update(dt) {
+        if (this.mesh && this.pose) {
+            this.mesh.position.set(this.pose.x, 0.5, -this.pose.y);
+            this.mesh.rotation.y = this.pose.yaw;
+=======
+=======
+>>>>>>> 17223b91776a0da043fcf37602be7c587d4adcf0
         const loader = new STLLoader();
         loader.load("./models/Transit_2.stl", geometry => {
             // STLLoader returns geometry, not an object
@@ -396,11 +462,34 @@ class VehicleEntity extends Drawable {
             }
         } else {
             this.pose = { x, y, yaw: 0 };
+<<<<<<< HEAD
+>>>>>>> 17223b91776a0da043fcf37602be7c587d4adcf0
+=======
+>>>>>>> 17223b91776a0da043fcf37602be7c587d4adcf0
         }
     }
 
     draw2D(renderer) {
         if (!this.pose) return;
+<<<<<<< HEAD
+<<<<<<< HEAD
+
+        const { x, y, yaw } = this.pose;
+        const s = renderer.worldToScreen(x, y);
+
+        const ctx = renderer.ctx;
+        ctx.save();
+        ctx.translate(s.x, s.y);
+        ctx.rotate(-yaw);
+
+        ctx.fillStyle = "red";
+        ctx.beginPath();
+        ctx.moveTo(12, 0);
+        ctx.lineTo(-10, -6);
+        ctx.lineTo(-10, 6);
+=======
+=======
+>>>>>>> 17223b91776a0da043fcf37602be7c587d4adcf0
         const { x, y, yaw } = this.pose;
         const s = renderer.worldToScreen(x, y);
         const ctx = renderer.ctx;
@@ -430,6 +519,10 @@ class VehicleEntity extends Drawable {
         ctx.moveTo(0, -14);   // tip
         ctx.lineTo(-5, -6);   // left base
         ctx.lineTo(5, -6);    // right base
+<<<<<<< HEAD
+>>>>>>> 17223b91776a0da043fcf37602be7c587d4adcf0
+=======
+>>>>>>> 17223b91776a0da043fcf37602be7c587d4adcf0
         ctx.closePath();
         ctx.fill();
 
@@ -437,6 +530,16 @@ class VehicleEntity extends Drawable {
     }
 
     draw3D(renderer){
+<<<<<<< HEAD
+<<<<<<< HEAD
+        if (!this.mesh || !this.pose) return;
+
+            const { x, y, yaw } = this.pose;
+            this.mesh.position.set(x, 0.5, -y);
+            this.mesh.rotation.y = yaw;
+=======
+=======
+>>>>>>> 17223b91776a0da043fcf37602be7c587d4adcf0
     if (!this.vGroup || !this.pose) return;
     const { x, y, yaw } = this.pose;
     this.vGroup.position.set(x, 0, -y);
@@ -445,6 +548,10 @@ class VehicleEntity extends Drawable {
         this.axesHelper = new THREE.AxesHelper(8); // red = +X local, green = +Y up, blue = +Z local
         this.vGroup.add(this.axesHelper);
     }
+<<<<<<< HEAD
+>>>>>>> 17223b91776a0da043fcf37602be7c587d4adcf0
+=======
+>>>>>>> 17223b91776a0da043fcf37602be7c587d4adcf0
                 
     }
 }
@@ -592,8 +699,16 @@ document.getElementById("toggleView").addEventListener("click", () => {
         renderer3d.camera.position.set(mapCenter.x, 30, -mapCenter.y + 50);
         renderer3d.camera.lookAt(mapCenter.x, 0, -mapCenter.y);
         document.getElementById("toggleView").innerText = "Switch to 2D";
+<<<<<<< HEAD
+<<<<<<< HEAD
+=======
         document.getElementById("controls-2d").style.display = "none";
         document.getElementById("controls-3d").style.display = "inline";
+>>>>>>> 17223b91776a0da043fcf37602be7c587d4adcf0
+=======
+        document.getElementById("controls-2d").style.display = "none";
+        document.getElementById("controls-3d").style.display = "inline";
+>>>>>>> 17223b91776a0da043fcf37602be7c587d4adcf0
     } else {
         canvas.style.display = "block";
         renderer3d.stop();
@@ -601,8 +716,17 @@ document.getElementById("toggleView").addEventListener("click", () => {
         
         renderer.start();
         document.getElementById("toggleView").innerText = "Switch to 3D";
+<<<<<<< HEAD
+<<<<<<< HEAD
+        
+=======
         document.getElementById("controls-2d").style.display = "inline";
         document.getElementById("controls-3d").style.display = "none";
+>>>>>>> 17223b91776a0da043fcf37602be7c587d4adcf0
+=======
+        document.getElementById("controls-2d").style.display = "inline";
+        document.getElementById("controls-3d").style.display = "none";
+>>>>>>> 17223b91776a0da043fcf37602be7c587d4adcf0
     }
 });
 
@@ -673,7 +797,14 @@ canvas.addEventListener("wheel", e => {
 window.addEventListener("keydown", e => {
     if (e.key === "f") {
         renderer.camera.follow = true;
+<<<<<<< HEAD
+<<<<<<< HEAD
+=======
         renderer3d.follow = true;
+>>>>>>> 17223b91776a0da043fcf37602be7c587d4adcf0
+=======
+        renderer3d.follow = true;
+>>>>>>> 17223b91776a0da043fcf37602be7c587d4adcf0
     }
 });
 
@@ -746,7 +877,15 @@ document.getElementById("startSelect")?.addEventListener("change", updateSelecti
 document.getElementById("goalSelect")?.addEventListener("change", updateSelection);
 
 // Compute route button — calls /route and draws waypoints
+<<<<<<< HEAD
+<<<<<<< HEAD
+// ---- ROUTING INTERFACE: response comes from your teammate's algo ----
+=======
 // ---- ROUTING INTERFACE: ----
+>>>>>>> 17223b91776a0da043fcf37602be7c587d4adcf0
+=======
+// ---- ROUTING INTERFACE: ----
+>>>>>>> 17223b91776a0da043fcf37602be7c587d4adcf0
 document.getElementById("computeRoute")?.addEventListener("click", () => {
     const start = document.getElementById("startSelect").value;
     const goal  = document.getElementById("goalSelect").value;

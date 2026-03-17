@@ -8,10 +8,22 @@
 export ROS_MASTER_URI='http://localhost:11311'
 
 # modified environment variables
+<<<<<<< HEAD
+<<<<<<< HEAD
+export PATH="/home/cholito/catkin_ws/devel/bin:$PATH"
+export PWD='/home/cholito/catkin_ws/build'
+=======
+=======
+>>>>>>> 17223b91776a0da043fcf37602be7c587d4adcf0
 export CMAKE_PREFIX_PATH="/home/cholito/catkin_ws/devel:$CMAKE_PREFIX_PATH"
 export LD_LIBRARY_PATH="/home/cholito/catkin_ws/devel/lib:$LD_LIBRARY_PATH"
 export PATH="/home/cholito/catkin_ws/devel/bin:$PATH"
 export PKG_CONFIG_PATH="/home/cholito/catkin_ws/devel/lib/pkgconfig:$PKG_CONFIG_PATH"
 export PWD='/home/cholito/catkin_ws/build'
 export PYTHONPATH="/home/cholito/catkin_ws/devel/lib/python3/dist-packages:$PYTHONPATH"
+<<<<<<< HEAD
 export ROS_PACKAGE_PATH="/home/cholito/catkin_ws/src:$ROS_PACKAGE_PATH"
+>>>>>>> 17223b91776a0da043fcf37602be7c587d4adcf0
+=======
+export ROS_PACKAGE_PATH="/home/cholito/catkin_ws/src:$ROS_PACKAGE_PATH"
+>>>>>>> 17223b91776a0da043fcf37602be7c587d4adcf0

@@ -362,9 +362,18 @@ EMPY_SCRIPT:STRING=/usr/lib/python3/dist-packages/em.py
 //The directory containing a CMake configuration file for Eigen3.
 Eigen3_DIR:PATH=/usr/lib/cmake/eigen3
 
+<<<<<<< HEAD
+<<<<<<< HEAD
+=======
 //Git command line client
 GIT_EXECUTABLE:FILEPATH=/usr/bin/git
 
+>>>>>>> 17223b91776a0da043fcf37602be7c587d4adcf0
+=======
+//Git command line client
+GIT_EXECUTABLE:FILEPATH=/usr/bin/git
+
+>>>>>>> 17223b91776a0da043fcf37602be7c587d4adcf0
 //Path to a file.
 GLOG_INCLUDE_DIR:PATH=/usr/include
 
@@ -639,9 +648,18 @@ class_loader_DIR:PATH=/opt/ros/noetic/share/class_loader/cmake
 //The directory containing a CMake configuration file for cpp_common.
 cpp_common_DIR:PATH=/opt/ros/noetic/share/cpp_common/cmake
 
+<<<<<<< HEAD
+<<<<<<< HEAD
+=======
 //The directory containing a CMake configuration file for eigen_conversions.
 eigen_conversions_DIR:PATH=/opt/ros/noetic/share/eigen_conversions/cmake
 
+>>>>>>> 17223b91776a0da043fcf37602be7c587d4adcf0
+=======
+//The directory containing a CMake configuration file for eigen_conversions.
+eigen_conversions_DIR:PATH=/opt/ros/noetic/share/eigen_conversions/cmake
+
+>>>>>>> 17223b91776a0da043fcf37602be7c587d4adcf0
 //Value Computed by CMake
 ethz_piksi_ros_BINARY_DIR:STATIC=/home/cholito/catkin_ws/build/ethz_piksi_ros/ethz_piksi_ros
 
@@ -910,6 +928,11 @@ lib:FILEPATH=/opt/ros/noetic/lib/libtf2.so
 //The directory containing a CMake configuration file for libgoogle-glog-dev.
 libgoogle-glog-dev_DIR:PATH=libgoogle-glog-dev_DIR-NOTFOUND
 
+<<<<<<< HEAD
+<<<<<<< HEAD
+=======
+=======
+>>>>>>> 17223b91776a0da043fcf37602be7c587d4adcf0
 //Value Computed by CMake
 libsbp_catkin_BINARY_DIR:STATIC=/home/cholito/catkin_ws/build/libsbp_catkin
 
@@ -937,6 +960,10 @@ libserialport_catkin_DIR:PATH=
 //Value Computed by CMake
 libserialport_catkin_SOURCE_DIR:STATIC=/home/cholito/catkin_ws/src/libserialport_catkin
 
+<<<<<<< HEAD
+>>>>>>> 17223b91776a0da043fcf37602be7c587d4adcf0
+=======
+>>>>>>> 17223b91776a0da043fcf37602be7c587d4adcf0
 //The directory containing a CMake configuration file for map_msgs.
 map_msgs_DIR:PATH=/opt/ros/noetic/share/map_msgs/cmake
 
@@ -965,6 +992,11 @@ nav_msgs_DIR:PATH=/opt/ros/noetic/share/nav_msgs/cmake
 nodelet_DIR:PATH=/opt/ros/noetic/share/nodelet/cmake
 
 //Value Computed by CMake
+<<<<<<< HEAD
+<<<<<<< HEAD
+=======
+=======
+>>>>>>> 17223b91776a0da043fcf37602be7c587d4adcf0
 piksi_multi_cpp_BINARY_DIR:STATIC=/home/cholito/catkin_ws/build/ethz_piksi_ros/piksi_multi_cpp
 
 //Dependencies for the target
@@ -980,6 +1012,10 @@ piksi_multi_interface_BINARY_DIR:STATIC=/home/cholito/catkin_ws/build/ethz_piksi
 piksi_multi_interface_SOURCE_DIR:STATIC=/home/cholito/catkin_ws/src/ethz_piksi_ros/piksi_multi_interface
 
 //Value Computed by CMake
+<<<<<<< HEAD
+>>>>>>> 17223b91776a0da043fcf37602be7c587d4adcf0
+=======
+>>>>>>> 17223b91776a0da043fcf37602be7c587d4adcf0
 piksi_multi_rtk_ros_BINARY_DIR:STATIC=/home/cholito/catkin_ws/build/ethz_piksi_ros/piksi_multi_rtk_ros
 
 //Value Computed by CMake
@@ -1006,12 +1042,21 @@ piksi_rtk_msgs_DIR:PATH=/home/cholito/catkin_ws/devel/share/piksi_rtk_msgs/cmake
 //Value Computed by CMake
 piksi_rtk_msgs_SOURCE_DIR:STATIC=/home/cholito/catkin_ws/src/ethz_piksi_ros/piksi_rtk_msgs
 
+<<<<<<< HEAD
+<<<<<<< HEAD
+=======
+=======
+>>>>>>> 17223b91776a0da043fcf37602be7c587d4adcf0
 //Value Computed by CMake
 piksi_v2_rtk_ros_BINARY_DIR:STATIC=/home/cholito/catkin_ws/build/ethz_piksi_ros/piksi_v2_rtk_ros
 
 //Value Computed by CMake
 piksi_v2_rtk_ros_SOURCE_DIR:STATIC=/home/cholito/catkin_ws/src/ethz_piksi_ros/piksi_v2_rtk_ros
 
+<<<<<<< HEAD
+>>>>>>> 17223b91776a0da043fcf37602be7c587d4adcf0
+=======
+>>>>>>> 17223b91776a0da043fcf37602be7c587d4adcf0
 //The directory containing a CMake configuration file for pluginlib.
 pluginlib_DIR:PATH=/opt/ros/noetic/share/pluginlib/cmake
 
@@ -1363,8 +1408,16 @@ FIND_PACKAGE_MESSAGE_DETAILS_PythonInterp:INTERNAL=[/usr/bin/python3][v3.8.10()]
 FIND_PACKAGE_MESSAGE_DETAILS_Threads:INTERNAL=[TRUE][v()]
 //Details about finding pugixml
 FIND_PACKAGE_MESSAGE_DETAILS_pugixml:INTERNAL=[/usr/lib/x86_64-linux-gnu/libpugixml.so][/usr/include][v()]
+<<<<<<< HEAD
+<<<<<<< HEAD
+=======
 //ADVANCED property for variable: GIT_EXECUTABLE
 GIT_EXECUTABLE-ADVANCED:INTERNAL=1
+>>>>>>> 17223b91776a0da043fcf37602be7c587d4adcf0
+=======
+//ADVANCED property for variable: GIT_EXECUTABLE
+GIT_EXECUTABLE-ADVANCED:INTERNAL=1
+>>>>>>> 17223b91776a0da043fcf37602be7c587d4adcf0
 //ADVANCED property for variable: GLOG_INCLUDE_DIR
 GLOG_INCLUDE_DIR-ADVANCED:INTERNAL=1
 //ADVANCED property for variable: GLOG_LIBRARY
