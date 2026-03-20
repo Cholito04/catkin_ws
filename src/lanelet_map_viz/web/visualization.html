@@ -54,10 +54,7 @@
             left: 0;
             width: 100vw;
             height: 100vh;
-        }
-
-        #three-container {
-            display: none;
+            display: block; 
         }
     </style>
 
@@ -76,8 +73,9 @@
     </script>
 </head>
 <body>
-    <button id="toggleView" style="position:absolute; top:10px; left:10px; z-index:20;">Switch to 3D</button>
-    <canvas id="map"></canvas>
+    <button id="toggleView" style="position:absolute; top:10px; left:10px; z-index:20;">
+        Switch to 3D
+    </button>
     <div id="three-container"></div>
 
     <div id="stop-controls" style="position:absolute; top:50px; right:10px;
@@ -92,11 +90,6 @@
 
 
     <script type="module" src="/main.js"></script>
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
-=======
->>>>>>> 17223b91776a0da043fcf37602be7c587d4adcf0
     <div id="controls-hint" style="
         position: absolute;
         bottom: 16px;
@@ -115,9 +108,5 @@
         <span id="controls-2d">Drag to pan | Scroll to zoom | F: re-center</span>
         <span id="controls-3d" style="display:none;">Left drag to orbit | Right drag to pan | Scroll to zoom | F: re-follow</span>
     </div>
-<<<<<<< HEAD
->>>>>>> 17223b91776a0da043fcf37602be7c587d4adcf0
-=======
->>>>>>> 17223b91776a0da043fcf37602be7c587d4adcf0
 </body>
 </html>
