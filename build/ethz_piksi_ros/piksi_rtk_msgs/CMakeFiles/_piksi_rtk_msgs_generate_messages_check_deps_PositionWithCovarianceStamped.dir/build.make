@@ -54,15 +54,7 @@ CMAKE_BINARY_DIR = /home/cholito/catkin_ws/build
 include ethz_piksi_ros/piksi_rtk_msgs/CMakeFiles/_piksi_rtk_msgs_generate_messages_check_deps_PositionWithCovarianceStamped.dir/progress.make
 
 ethz_piksi_ros/piksi_rtk_msgs/CMakeFiles/_piksi_rtk_msgs_generate_messages_check_deps_PositionWithCovarianceStamped:
-<<<<<<< HEAD
-<<<<<<< HEAD
-	cd /home/cholito/catkin_ws/build/ethz_piksi_ros/piksi_rtk_msgs && ../../catkin_generated/env_cached.sh /usr/bin/python3 /opt/ros/noetic/share/genmsg/cmake/../../../lib/genmsg/genmsg_check_deps.py piksi_rtk_msgs /home/cholito/catkin_ws/src/ethz_piksi_ros/piksi_rtk_msgs/msg/PositionWithCovarianceStamped.msg std_msgs/Header:geometry_msgs/Point:piksi_rtk_msgs/PositionWithCovariance
-=======
-	cd /home/cholito/catkin_ws/build/ethz_piksi_ros/piksi_rtk_msgs && ../../catkin_generated/env_cached.sh /usr/bin/python3 /opt/ros/noetic/share/genmsg/cmake/../../../lib/genmsg/genmsg_check_deps.py piksi_rtk_msgs /home/cholito/catkin_ws/src/ethz_piksi_ros/piksi_rtk_msgs/msg/PositionWithCovarianceStamped.msg piksi_rtk_msgs/PositionWithCovariance:std_msgs/Header:geometry_msgs/Point
->>>>>>> 17223b91776a0da043fcf37602be7c587d4adcf0
-=======
-	cd /home/cholito/catkin_ws/build/ethz_piksi_ros/piksi_rtk_msgs && ../../catkin_generated/env_cached.sh /usr/bin/python3 /opt/ros/noetic/share/genmsg/cmake/../../../lib/genmsg/genmsg_check_deps.py piksi_rtk_msgs /home/cholito/catkin_ws/src/ethz_piksi_ros/piksi_rtk_msgs/msg/PositionWithCovarianceStamped.msg piksi_rtk_msgs/PositionWithCovariance:std_msgs/Header:geometry_msgs/Point
->>>>>>> 17223b91776a0da043fcf37602be7c587d4adcf0
+	cd /home/cholito/catkin_ws/build/ethz_piksi_ros/piksi_rtk_msgs && ../../catkin_generated/env_cached.sh /usr/bin/python3 /opt/ros/noetic/share/genmsg/cmake/../../../lib/genmsg/genmsg_check_deps.py piksi_rtk_msgs /home/cholito/catkin_ws/src/ethz_piksi_ros/piksi_rtk_msgs/msg/PositionWithCovarianceStamped.msg std_msgs/Header:piksi_rtk_msgs/PositionWithCovariance:geometry_msgs/Point
 
 _piksi_rtk_msgs_generate_messages_check_deps_PositionWithCovarianceStamped: ethz_piksi_ros/piksi_rtk_msgs/CMakeFiles/_piksi_rtk_msgs_generate_messages_check_deps_PositionWithCovarianceStamped
 _piksi_rtk_msgs_generate_messages_check_deps_PositionWithCovarianceStamped: ethz_piksi_ros/piksi_rtk_msgs/CMakeFiles/_piksi_rtk_msgs_generate_messages_check_deps_PositionWithCovarianceStamped.dir/build.make

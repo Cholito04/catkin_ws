@@ -1,1 +1,0 @@
-cmd='$(CMAKE_BINARY_DIR)/libserialport-prefix/src/libserialport/autogen.sh;COMMAND;$(CMAKE_BINARY_DIR)/libserialport-prefix/src/libserialport/configure;--prefix=/home/cholito/catkin_ws/devel'

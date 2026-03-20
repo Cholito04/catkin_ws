@@ -1,0 +1,19 @@
+# ROS build artifacts
+/devel/
+/build/
+/logs/
+/install/
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+
+# temp files generated at runtime
+web/temp.html
+
+# VS Code
+.vscode/
+
+# OS
+.DS_Store

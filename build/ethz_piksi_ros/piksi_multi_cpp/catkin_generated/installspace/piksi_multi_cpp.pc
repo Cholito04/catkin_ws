@@ -1,8 +1,0 @@
-prefix=/home/cholito/catkin_ws/install
-
-Name: piksi_multi_cpp
-Description: Description of piksi_multi_cpp
-Version: 0.0.1
-Cflags: -I${prefix}/include
-Libs: -L${prefix}/lib -lpiksi_multi_cpp
-Requires: libsbp_catkin roscpp libsbp_ros_msgs piksi_rtk_msgs std_msgs geometry_msgs sensor_msgs eigen_conversions roslib libserialport_catkin

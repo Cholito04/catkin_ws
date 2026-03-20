@@ -1,8 +1,0 @@
-prefix=/home/cholito/catkin_ws/devel
-
-Name: piksi_v2_rtk_ros
-Description: Description of piksi_v2_rtk_ros
-Version: 1.10.0
-Cflags: 
-Libs: -L${prefix}/lib 
-Requires: piksi_rtk_msgs sensor_msgs geometry_msgs
