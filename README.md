@@ -28,3 +28,9 @@ To add more nodes to the workspace add run:
 7. source devel/setup.bash
 8. add launch folder
 9. add launch file in folder
+
+RUNNING GPS SCRIPT:
+1. update github repo(if you delete the old one and do a full replace delete the build and devel folders then run catkin_make and source devel/setup.bash
+2. cd to catkin_ws, run roscore then open a new terminal
+3. run roslaunch lanelet_map_viz browser_gps.launch (fingers crossed it worked)
+4.
