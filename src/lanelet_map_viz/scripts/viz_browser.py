@@ -12,8 +12,8 @@ from socketserver import TCPServer
 import lanelet2
 from lanelet2.projection import UtmProjector
 
-from geometry_msgs.msg import Point, PoseStamped
-from tf.transformations import euler_from_quaternion
+from geometry_msgs.msg import Pose2D
+from visualization_msgs.msg import MarkerArray
 
 import webbrowser
 import math
@@ -27,6 +27,8 @@ traffic_rules = None
 llmap_global = None
 data_lock = threading.Lock()
 stops_data = {}
+predicted_objects = []
+tracked_objects = []
 
 STOPS = {
     "Bus Loop": [42.284244, -85.617362],
@@ -87,7 +89,9 @@ class DataHandler(SimpleHTTPRequestHandler):
             with data_lock:
                 data = {
                     'map': map_data,
-                    'vehicle': vehicle_pose
+                    'vehicle': vehicle_pose,
+                    'predicted_objects': predicted_objects,
+                    'tracked_objects': tracked_objects
                 }
 
             self.send_response(200)
@@ -106,10 +110,9 @@ class DataHandler(SimpleHTTPRequestHandler):
         if self.path == '/route':
             content_length = int(self.headers['Content-Length'])
             body = json.loads(self.rfile.read(content_length))
-            
+
             start_stop = stops_data[body["start"]]
-            goal_stop = stops_data[body["goal"]]
-            
+            goal_stop  = stops_data[body["goal"]]
 
             start_ll = get_lanelet_by_id(llmap_global, start_stop["lanelet_id"])
             goal_ll  = get_lanelet_by_id(llmap_global, goal_stop["lanelet_id"])
@@ -118,9 +121,16 @@ class DataHandler(SimpleHTTPRequestHandler):
             if start_ll is not None and goal_ll is not None:
                 route_pts = compute_centerline_route_points(start_ll, goal_ll)
 
-            # fallback: straight line if routing fails
             if not route_pts:
                 route_pts = [start_stop["centerline_point"], goal_stop["centerline_point"]]
+
+            # prepend current vehicle position so route starts from the van
+            with data_lock:
+                current_pose = vehicle_pose
+
+            if current_pose:
+                route_pts = [[current_pose["x"], current_pose["y"]]] + route_pts
+
             self.send_response(200)
             self.send_header('Content-Type', 'application/json')
             self.end_headers()
@@ -137,14 +147,41 @@ def find_free_port():
 
 def pose_callback(msg):
     global vehicle_pose
-    q = msg.pose.orientation
-    yaw = euler_from_quaternion([q.x, q.y, q.z, q.w])[2]
     with data_lock:
         vehicle_pose = {
-            "x": msg.pose.position.x,
-            "y": msg.pose.position.y,
-            "yaw": yaw
+            "x": msg.x - ORIGIN_LOCAL_X,
+            "y": msg.y - ORIGIN_LOCAL_Y,
+            "yaw": msg.theta
         }
+
+
+# kinematics callbacks
+def predicted_callback(msg):
+    global predicted_objects, vehicle_pose
+    with data_lock:
+        vx = vehicle_pose["x"] if vehicle_pose else 0
+        vy = vehicle_pose["y"] if vehicle_pose else 0
+        predicted_objects = [
+            {
+                "x": m.pose.position.x + vx,
+                "y": m.pose.position.y + vy
+            }
+            for m in msg.markers
+        ]
+
+
+def tracked_callback(msg):
+    global tracked_objects, vehicle_pose
+    with data_lock:
+        vx = vehicle_pose["x"] if vehicle_pose else 0
+        vy = vehicle_pose["y"] if vehicle_pose else 0
+        tracked_objects = [
+            {
+                "x": m.pose.position.x + vx,
+                "y": m.pose.position.y + vy
+            }
+            for m in msg.markers
+        ]
 
 
 def load_lanelet_map(map_path):
@@ -300,7 +337,10 @@ def main():
     debug_map_bounds(llmap)
     rospy.loginfo(f"Loaded {len(map_data)} lanelets")
     stops_data = build_stops(llmap, projector)
-    rospy.Subscriber("/vehicle_pose", PoseStamped, pose_callback)
+    # set up subscribers to get data from ros topics
+    rospy.Subscriber("/vehicle_pose", Pose2D, pose_callback)
+    rospy.Subscriber("/predicted_objects", MarkerArray, predicted_callback)
+    rospy.Subscriber("/tracked_objects", MarkerArray, tracked_callback)
 
     port = find_free_port()
     
