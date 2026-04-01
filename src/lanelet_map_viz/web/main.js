@@ -2,6 +2,10 @@ import * as THREE from 'three';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 import {STLLoader} from "three/addons/loaders/STLLoader.js"
 
+let routeWaypoints = [];
+let routeStartTime = null;
+let routeTotalTime = 0; //seconds
+const SPEED_MPS = 5; //meters/sec
 
 // base class
 class Drawable {
@@ -208,11 +212,14 @@ class Renderer3d {
         this.controls.update();
 
         this.updateCamera();
-        this.camera.position.y = Math.max(this.camera.position.y, 2); // prevent going underground
+        if (!this.is2D){
+            this.camera.position.y = Math.max(this.camera.position.y, 2); // prevent going underground
+        }
         this.drawables.forEach(d => { 
             d.update?.(dt);
             d.draw3D?.(this);
         });
+        updateTimer();
         this.renderer.render(this.scene, this.activeCamera);
 
         requestAnimationFrame(this.render);
@@ -573,96 +580,58 @@ class RouteLayer extends Drawable {
     }
 }
 
-const threeContainer = document.getElementById("three-container");
-
-const renderer3d = new Renderer3d(threeContainer)
-
-const DATA_URL = `http://localhost:${PORT}/data`;
-
-let mapData = null;
-let mapCenter = {x: 0, y: 0 };
-
-const lanelets = new LaneletLayer(mapData);
-const vehicle = new VehicleEntity();
-
-const stopsLayer = new StopsLayer();
-const routeLayer = new RouteLayer();
-
-// add drawables ONCE
-
-renderer3d.add(lanelets);
-renderer3d.add(vehicle);
-
-renderer3d.add(stopsLayer);
-renderer3d.add(routeLayer);
-
-// start in 2D
-renderer3d.toggle2D();  // start in top-down
-threeContainer.style.display = "block";
-renderer3d.start();
-
-let is3D = false;
-
-document.getElementById("toggleView").addEventListener("click", () => {
-    renderer3d.toggle2D();
-    const btn = document.getElementById("toggleView");
-    btn.innerText = renderer3d.is2D ? "Switch to 3D" : "Top Down View";
-    document.getElementById("controls-2d").style.display = renderer3d.is2D ? "inline" : "none";
-    document.getElementById("controls-3d").style.display = renderer3d.is2D ? "none" : "inline";
-});
-
-function computeMapCenter(mapData) {
-    let sumX = 0, sumY = 0, count = 0;
-    mapData.forEach(ll => {
-        ll.center.forEach(p => {
-            sumX += p[0]; sumY += p[1]; count++;
-        });
-    });
-    mapCenter.x = sumX / count;
-    mapCenter.y = sumY / count;
-
-    // center the top down camera on first load
-    renderer3d.topDownCamera.position.set(mapCenter.x, 500, -mapCenter.y);
-    renderer3d.topDownCamera.lookAt(mapCenter.x, 0, -mapCenter.y);
-    renderer3d.controls.target.set(mapCenter.x, 0, -mapCenter.y);
-}
-
-window.addEventListener("keydown", e => {
-    if (e.key === "f") {
-        renderer3d.follow = true;
+class KinematicsLayer extends Drawable {
+    constructor() {
+        super();
+        this.predicted = [];
+        this.tracked = [];
+        this.markers = [];
     }
-});
 
-window.addEventListener("resize", () => {
-    renderer3d.renderer.setSize(window.innerWidth, window.innerHeight);
-    renderer3d.camera.aspect = window.innerWidth / window.innerHeight;
-    renderer3d.camera.updateProjectionMatrix();
-    renderer3d.topDownCamera.left   = -window.innerWidth / 2;
-    renderer3d.topDownCamera.right  =  window.innerWidth / 2;
-    renderer3d.topDownCamera.top    =  window.innerHeight / 2;
-    renderer3d.topDownCamera.bottom = -window.innerHeight / 2;
-    renderer3d.topDownCamera.updateProjectionMatrix();
-});
+    onAdd(renderer) {
+        if (!(renderer instanceof Renderer3d)) return;
+        this.scene = renderer.scene;
+        this.markers = [];
+    }
 
-// DATA FETCH
-function fetchData() {
-    fetch(DATA_URL)
-        .then(r => r.json())
-        .then(d => {
-            lanelets.mapData = d.map;
-            if (d.map && !mapData) {
-                mapData = d.map;                
-                lanelets.build3D();
-                computeMapCenter(d.map);
-            }
-            vehicle.setPose(d.vehicle);
-        })
-        .catch(() => {});
+    setData(predicted, tracked) {
+        this.predicted = predicted || [];
+        this.tracked = tracked || [];
+    }
+
+    draw3D(renderer) {
+        // remove old markers
+        this.markers.forEach(m => this.scene.remove(m));
+        this.markers = [];
+
+        // tracked objects — red spheres
+        this.tracked.forEach(obj => {
+            const geo = new THREE.SphereGeometry(1, 8, 8);
+            const mat = new THREE.MeshBasicMaterial({ color: 0xff0000 });
+            const sphere = new THREE.Mesh(geo, mat);
+            sphere.position.set(obj.x, 1, -obj.y);
+            this.scene.add(sphere);
+            this.markers.push(sphere);
+        });
+
+        // predicted objects — blue spheres
+        this.predicted.forEach(obj => {
+            const geo = new THREE.SphereGeometry(1, 8, 8);
+            const mat = new THREE.MeshBasicMaterial({ 
+                color: 0x0000ff,
+                transparent: true,
+                opacity: 0.6
+            });
+            const sphere = new THREE.Mesh(geo, mat);
+            sphere.position.set(obj.x, 1, -obj.y);
+            this.scene.add(sphere);
+            this.markers.push(sphere);
+        });
+    }
 }
-
 
 // Fetch stops once on load and populate dropdowns
-function fetchStops() {
+function fetchStops(stopsLayer) {
     fetch(`http://localhost:${PORT}/stops`)
         .then(r => r.json())
         .then(stops => {
@@ -691,34 +660,164 @@ function fetchStops() {
 
             updateSelection();
         })
-        .catch(() => setTimeout(fetchStops, 500));
+        .catch(() => setTimeout(() => fetchStops(stopsLayer), 500));
 }
-fetchStops();
 
-function updateSelection() {
+function updateSelection(stopsLayer) {
     const start = document.getElementById("startSelect").value;
     const goal  = document.getElementById("goalSelect").value;
     stopsLayer.setSelection(start, goal);
 }
 
-document.getElementById("startSelect")?.addEventListener("change", updateSelection);
-document.getElementById("goalSelect")?.addEventListener("change", updateSelection);
+//compute route lenght
+function computeRouteLength(waypoints) {
+    let length = 0;
 
-//routing 
-document.getElementById("computeRoute")?.addEventListener("click", () => {
-    const start = document.getElementById("startSelect").value;
-    const goal  = document.getElementById("goalSelect").value;
+    for (let i = 1; i < waypoints.length; i++) {
+        const dx = waypoints[i][0] - waypoints[i - 1][0];
+        const dy = waypoints[i][1] - waypoints[i - 1][1];
+        length += Math.sqrt(dx * dx + dy * dy);
+    }
 
-    fetch(`http://localhost:${PORT}/route`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ start, goal })
-    })
-    .then(r => r.json())
-    .then(data => {
-        routeLayer.setWaypoints(data.waypoints);
-    })
-    .catch(err => console.error("Route request failed:", err));
-});
+    return length; // meters (since your ENU map is meters)
+}
 
-setInterval(fetchData, 100);
+//update timer every frame
+function updateTimer() {
+    if (!routeStartTime) return;
+
+    const elapsed = (performance.now() - routeStartTime) / 1000;
+    const remaining = Math.max(routeTotalTime - elapsed, 0);
+
+    const minutes = Math.floor(remaining / 60);
+    const seconds = Math.floor(remaining % 60);
+
+    const timer =  document.getElementById("timeRemaining");
+    if (timer) {
+        timer.textContent = `${minutes}:${seconds.toString().padStart(2,'0')}`;
+    }
+    document.getElementById("timeRemaining").textContent =
+        `${minutes}:${seconds.toString().padStart(2, '0')}`;
+}
+
+
+function main(){
+    //set up map scene and load data
+    const threeContainer = document.getElementById("three-container");
+    const renderer3d = new Renderer3d(threeContainer)
+    const DATA_URL = `http://localhost:${PORT}/data`;
+
+    let mapData = null;
+    let mapCenter = {x: 0, y: 0 };
+
+    //create drawables
+    const lanelets = new LaneletLayer(mapData);
+    const vehicle = new VehicleEntity();
+    const stopsLayer = new StopsLayer();
+    const routeLayer = new RouteLayer();
+    const kinematicsLayer = new KinematicsLayer();
+
+    // add drawables ONCE
+    renderer3d.add(lanelets);
+    renderer3d.add(vehicle);
+    renderer3d.add(stopsLayer);
+    renderer3d.add(routeLayer);
+    renderer3d.add(kinematicsLayer);
+
+    // start in 2Dcamera
+    renderer3d.toggle2D();  // start in top-down
+    threeContainer.style.display = "block";
+    renderer3d.start();
+
+    document.getElementById("toggleView").addEventListener("click", () => {
+        renderer3d.toggle2D();
+        const btn = document.getElementById("toggleView");
+        btn.innerText = renderer3d.is2D ? "Switch to 3D" : "Top Down View";
+        document.getElementById("controls-2d").style.display = renderer3d.is2D ? "inline" : "none";
+        document.getElementById("controls-3d").style.display = renderer3d.is2D ? "none" : "inline";
+    });
+
+
+    window.addEventListener("keydown", e => {
+        if (e.key === "f") {
+            renderer3d.follow = true;
+        }
+    });
+
+    window.addEventListener("resize", () => {
+        renderer3d.renderer.setSize(window.innerWidth, window.innerHeight);
+        renderer3d.camera.aspect = window.innerWidth / window.innerHeight;
+        renderer3d.camera.updateProjectionMatrix();
+        renderer3d.topDownCamera.left   = -window.innerWidth / 2;
+        renderer3d.topDownCamera.right  =  window.innerWidth / 2;
+        renderer3d.topDownCamera.top    =  window.innerHeight / 2;
+        renderer3d.topDownCamera.bottom = -window.innerHeight / 2;
+        renderer3d.topDownCamera.updateProjectionMatrix();
+    });
+
+    function fetchData() {
+        fetch(DATA_URL)
+            .then(r => r.json())
+            .then(d => {
+                lanelets.mapData = d.map;
+                if (d.map && !mapData) {
+                    mapData = d.map;
+                    lanelets.build3D();
+                    computeMapCenter(d.map);
+                }
+                vehicle.setPose(d.vehicle);
+                kinematicsLayer.setData(d.predicted_objects, d.tracked_objects);
+            })
+            .catch(() => {});
+    }
+
+    fetchStops(stopsLayer);
+
+    document.getElementById("startSelect")?.addEventListener("change", () => updateSelection(stopsLayer));
+    document.getElementById("goalSelect")?.addEventListener("change", () => updateSelection(stopsLayer));
+
+    //routing 
+    document.getElementById("computeRoute")?.addEventListener("click", () => {
+        const start = document.getElementById("startSelect").value;
+        const goal  = document.getElementById("goalSelect").value;
+
+        fetch(`http://localhost:${PORT}/route`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ start, goal })
+        })
+        .then(r => r.json())
+        .then(data => {
+            routeLayer.setWaypoints(data.waypoints);
+            routeWaypoints = data.waypoints;
+            const length = computeRouteLength(routeWaypoints);
+
+            routeTotalTime = length / SPEED_MPS;
+            routeStartTime = performance.now();
+
+            console.log("route lenght:", lenght, "meters");
+            console.log("ETA:", routeTotalTime, "seconds");
+        })
+        .catch(err => console.error("Route request failed:", err));
+    });
+
+    function computeMapCenter(mapData) {
+        let sumX = 0, sumY = 0, count = 0;
+        mapData.forEach(ll => {
+            ll.center.forEach(p => {
+                sumX += p[0]; sumY += p[1]; count++;
+            });
+        });
+        mapCenter.x = sumX / count;
+        mapCenter.y = sumY / count;
+
+        // center the top down camera on first load
+        renderer3d.topDownCamera.position.set(mapCenter.x, 500, -mapCenter.y);
+        renderer3d.topDownCamera.lookAt(mapCenter.x, 0, -mapCenter.y);
+        renderer3d.controls.target.set(mapCenter.x, 0, -mapCenter.y);
+    }
+
+    
+    setInterval(fetchData, 100);
+}
+main();
