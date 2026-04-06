@@ -274,8 +274,6 @@ def compute_centerline_route_points(start_lanelet, goal_lanelet):
 
     return filtered if len(filtered) >= 2 else None
 
-
-
 def create_html_file(port):
     html_path = os.path.join(os.path.dirname(__file__), "../web/visualization.html")
     with open(html_path, "r") as f:
@@ -300,6 +298,115 @@ def debug_map_bounds(llmap):
     rospy.loginfo(f"Map X range: {min(xs):.1f} to {max(xs):.1f}")
     rospy.loginfo(f"Map Y range: {min(ys):.1f} to {max(ys):.1f}")
     rospy.loginfo(f"Map center: {sum(xs)/len(xs):.1f}, {sum(ys)/len(ys):.1f}")
+class MockPoint:
+    def __init__(self, x, y):
+        self.x = x
+        self.y = y
+
+class MockLanelet:
+    def __init__(self, id, points):
+        self.id = id
+        self.centerline = points
+
+class MockMap:
+    def __init__(self, lanelets):
+        self.laneletLayer = lanelets
+
+# covers test unit2 for TR1, 2, 5
+def test_basic_nearest():
+    ll1 = MockLanelet(1, [MockPoint(0,0), MockPoint(5,5)])
+    ll2 = MockLanelet(2, [MockPoint(10,10)])
+
+    llmap = MockMap([ll1, ll2])
+
+    lanelet_id, point = find_nearest_lanelet(1,1,llmap)
+
+    assert lanelet_id == 1
+
+# covers for unit2 test for TR3, 4
+def test_false_branch():
+    ll1 = MockLanelet(1, [MockPoint(1,1)])
+    ll2 = MockLanelet(2, [MockPoint(100,100)])
+
+    llmap = MockMap([ll1, ll2])
+
+    lanelet_id, point = find_nearest_lanelet(0,0,llmap)
+
+    assert lanelet_id == 1
+
+#covers for unit1 test TR1
+def test_no_routing_graph():
+    global routing_graph
+    routing_graph = None
+
+    result = compute_centerline_route_points(None, None)
+
+    assert result is None
+
+# covers for unit1 test TR2
+def test_no_path(monkeypatch):
+    class MockGraph:
+        def shortestPath(self, a, b):
+            return None
+
+    global routing_graph
+    routing_graph = MockGraph()
+
+    result = compute_centerline_route_points(None, None)
+
+    assert result is None
+
+# covers for unit1 test TR3, 5, 9
+def test_valid_path():
+    class MockLanelet:
+        def __init__(self):
+            self.centerline = [MockPoint(0,0), MockPoint(1,1)]
+
+    class MockGraph:
+        def shortestPath(self, a, b):
+            return [MockLanelet()]
+
+    global routing_graph
+    routing_graph = MockGraph()
+
+    result = compute_centerline_route_points(None, None)
+
+    assert len(result) > 0
+
+# covers for unit1 test TR4
+def test_empty_lanelets(monkeypatch):
+    class MockGraph:
+        def shortestPath(self, a, b):
+            return []
+
+    global routing_graph
+    routing_graph = MockGraph()
+
+    result = compute_centerline_route_points(None, None)
+
+    assert result is None
+
+# covers TR6, 7, 8, 9
+def test_filtered_duplicates():
+    class MockLanelet:
+        def __init__(self):
+            # duplicate consecutive points
+            self.centerline = [
+                MockPoint(0,0),
+                MockPoint(0,0),
+                MockPoint(1,1)
+            ]
+
+    class MockGraph:
+        def shortestPath(self, a, b):
+            return [MockLanelet()]
+
+    global routing_graph
+    routing_graph = MockGraph()
+
+    result = compute_centerline_route_points(None, None)
+
+    assert result == [[0.0, 0.0], [1.0, 1.0]]
 
 def main():
     global map_data, stops_data, llmap_global, routing_graph, traffic_rules
