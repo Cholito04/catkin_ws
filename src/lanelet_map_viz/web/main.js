@@ -6,6 +6,8 @@ let routeWaypoints = [];
 let routeStartTime = null;
 let routeTotalTime = 0; //seconds
 const SPEED_MPS = 5; //meters/sec
+let followRoute = true;
+let stopsData = null;
 
 // base class
 class Drawable {
@@ -635,16 +637,18 @@ function fetchStops(stopsLayer) {
     fetch(`http://localhost:${PORT}/stops`)
         .then(r => r.json())
         .then(stops => {
-            console.log("stops received:", Object.keys(stops).length, stops);
             if (Object.keys(stops).length === 0) {
-                console.warn("Received empty stops data");
-                setTimeout(fetchStops, 500);
+                setTimeout(() => fetchStops(stopsLayer), 500);
                 return;
             }
-            stopsLayer.setStops(stops);
+            stopsData = stops;
+            stopsLayer.setStops(stopsData);
 
             const startSel = document.getElementById("startSelect");
             const goalSel  = document.getElementById("goalSelect");
+
+            // only populate if empty — prevents repopulation
+            if (startSel.options.length > 0) return;
 
             Object.entries(stops).forEach(([key, stop]) => {
                 [startSel, goalSel].forEach(sel => {
@@ -655,12 +659,9 @@ function fetchStops(stopsLayer) {
                 });
             });
 
-            // default goal to second stop so they're not the same
             if (goalSel.options.length > 1) goalSel.selectedIndex = 1;
-
-            updateSelection();
+            updateSelection(stopsLayer);
         })
-        .catch(() => setTimeout(() => fetchStops(stopsLayer), 500));
 }
 
 function updateSelection(stopsLayer) {
@@ -765,13 +766,15 @@ function main(){
                     lanelets.build3D();
                     computeMapCenter(d.map);
                 }
-                vehicle.setPose(d.vehicle);
+                if (!followRoute) {
+                    vehicle.setPose(d.vehicle);
+                }
                 kinematicsLayer.setData(d.predicted_objects, d.tracked_objects);
             })
             .catch(() => {});
     }
-
     fetchStops(stopsLayer);
+    
 
     document.getElementById("startSelect")?.addEventListener("change", () => updateSelection(stopsLayer));
     document.getElementById("goalSelect")?.addEventListener("change", () => updateSelection(stopsLayer));
@@ -795,7 +798,9 @@ function main(){
             routeTotalTime = length / SPEED_MPS;
             routeStartTime = performance.now();
 
-            console.log("route lenght:", lenght, "meters");
+            followRoute = true;
+
+            console.log("route lenght:", length, "meters");
             console.log("ETA:", routeTotalTime, "seconds");
         })
         .catch(err => console.error("Route request failed:", err));
