@@ -1,20 +1,21 @@
 <launch>
+    <!-- Map file path — change this to your actual map location -->
     <arg name="map_file" default="$(find lanelet_map_viz)/maps/wes_roads_shifted.osm"/>
     
-    <include file="$(find piksi_multi_rtk_ros)/launch/piksi_multi_rover.launch">
-        <arg name="interface" value="tcp"/>
+    <arg name="pcd_file" default="$(find lanelet_map_viz)/maps/full1small.pcd"/>
+    
+     <!-- ADD THIS: PCD file 
+    <include file="$(find piksi_multi_rtk_ros)/launch/piksi_multi_base_station.launch">
         <arg name="tcp_addr"  value="192.168.0.223"/>
     </include>
+     -->
     <node pkg="lanelet_map_viz" type="gps_to_vehicle_pose.py" name="vehicle_pose_node"
-          output="screen"/>
-
-    <node pkg="lanelet_map_viz" type="multi_object_tracker.py" name="multi_object_tracker"
-          output="screen"/>
-    <node pkg="lanelet_map_viz" type="multi_object_predictions.py" name="multi_object_prediction"
           output="screen"/>
 
     <node pkg="lanelet_map_viz" type="viz_browser.py" name="lanelet_web_viz"
           output="screen">
         <param name="map_file" value="$(arg map_file)"/>
+        
+        <param name="pcd_file" value="$(arg pcd_file)"/>
     </node>
 </launch>

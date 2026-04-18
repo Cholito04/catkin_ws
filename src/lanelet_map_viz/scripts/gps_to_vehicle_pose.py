@@ -10,6 +10,9 @@ from piksi_rtk_msgs.msg import BaselineHeading
 import tf2_ros
 import geometry_msgs.msg
 
+VOffset_X = 1950   # from the osm file node id=2
+VOffset_Y = 2960 # bigger for higher
+
 
 class VehiclePoseNode:
 
@@ -26,7 +29,7 @@ class VehiclePoseNode:
         self.br = tf2_ros.TransformBroadcaster()
 
         rospy.Subscriber(
-            "/piksi/enu_pose_best_fix",
+            "/piksi_multi_base_station/enu_pose_best_fix",
             PoseWithCovarianceStamped,
             self.pos_callback
         )
@@ -41,20 +44,18 @@ class VehiclePoseNode:
 
         self.x = msg.pose.pose.position.x
         self.y = msg.pose.pose.position.y
-
         self.publish()
 
     def heading_callback(self, msg):
 
         self.yaw = math.radians(msg.heading)
-
         self.publish()
 
     def publish(self):
 
         pose = Pose2D()
-        pose.x = self.x
-        pose.y = self.y
+        pose.x = self.x - VOffset_X
+        pose.y = self.y - VOffset_Y
         pose.theta = self.yaw
         self.pub.publish(pose)
 

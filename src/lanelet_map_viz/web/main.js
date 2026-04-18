@@ -84,7 +84,8 @@ class Renderer3d {
             roads: new THREE.Group(),
             laneMarkings: new THREE.Group(),
             vehicles: new THREE.Group(),
-            debug: new THREE.Group()
+            debug: new THREE.Group(),
+            pointcloud: new THREE>Group()
         };
 
         this.controls.addEventListener('start', () => {
@@ -355,16 +356,9 @@ class VehicleEntity extends Drawable {
         super();
         this.pose = null;
         this.mesh = null;
-
-        //fake motion state
-        this.t = 0;
-        this.radius = 25;
-
-        this.angularSpeed = 0.4;
     }
 
     setPose(pose) {
-        if (pose) this.useRealPose = true;
         this.pose = pose;
     }
 
@@ -383,8 +377,13 @@ class VehicleEntity extends Drawable {
                 roughness: 0.5,
                 metalness: 0.3
             });
-            const mesh = new THREE.Mesh(geometry, material);
 
+            const color = 0xffffff
+
+            // sphere marker
+            const geo = new THREE.SphereGeometry(3, 10, 10);
+            const mat = new THREE.MeshBasicMaterial({ color });
+            const mesh = new THREE.Mesh(geo, mat);
                 // get raw model dimensions before any scaling
             const box = new THREE.Box3().setFromObject(mesh);
             const size = box.getSize(new THREE.Vector3());
@@ -409,30 +408,7 @@ class VehicleEntity extends Drawable {
         xhr => console.log(`Model: ${(xhr.loaded / xhr.total * 100).toFixed(1)}% loaded`),
         err => console.error("STL load error:", err)
         );
-    }
-
-    update(dt) {
-        if (this.useRealPose) return;
-
-        this.t += dt * this.angularSpeed;
-        const x = Math.cos(this.t) * this.radius;
-        const y = Math.sin(this.t) * this.radius;
-        const targetYaw = Math.atan2(
-            Math.cos(this.t),
-            -Math.sin(this.t)
-        );
-
-        if (this.pose) {
-            let dyaw = targetYaw - this.pose.yaw;
-            while (dyaw >  Math.PI) dyaw -= 2 * Math.PI;
-            while (dyaw < -Math.PI) dyaw += 2 * Math.PI;
-            const smoothYaw = this.pose.yaw + dyaw * 0.2;
-            this.pose = { x, y, yaw: smoothYaw };
-        } else {
-            this.pose = { x, y, yaw: targetYaw };
-        }
-    }
-
+    } 
     draw3D(renderer) {
         if (!this.vGroup || !this.pose) return;
         const { x, y, yaw } = this.pose;
@@ -521,7 +497,7 @@ class RouteLayer extends Drawable {
         if (this.waypoints.length < 2 || !this.scene) return;
 
         // build a ribbon mesh along the route instead of a line
-        const laneWidth = 3.5; // meters — adjust to match your lane width
+        const laneWidth = 3; // meters
         const positions = [];
         const indices = [];
 
@@ -632,6 +608,77 @@ class KinematicsLayer extends Drawable {
     }
 }
 
+class PointCloudLayer extends Drawable {
+    constructor() {
+        super();
+        this.points = null;
+        this.geometry = null;
+        this.material = null;
+        this.data = [];
+    }
+
+    onAdd(renderer) {
+        if (!(renderer instanceof Renderer3d)) return;
+
+        this.group = new THREE.Group();
+        renderer.layers.pointcloud.add(this.group);
+
+        this.geometry = new THREE.BufferGeometry();
+
+        this.material = new THREE.PointsMaterial({
+            size: 0.2,              // adjust density look
+            color: 0xcfa44a,        // gold to match your theme
+            sizeAttenuation: true,
+            transparent: true,
+            opacity: 0.8
+        });
+
+        this.points = new THREE.Points(this.geometry, this.material);
+        this.group.add(this.points);
+    }
+
+    setPoints(pointsArray) {
+        // pointsArray = [{x, y, z}, ...]
+        this.data = pointsArray || [];
+        this.updateGeometry();
+    }
+
+    updateGeometry() {
+        if (!this.geometry) return;
+
+        const positions = [];
+
+        this.data.forEach(p => {
+            // convert to your coordinate system
+            positions.push(
+                p.x,
+                p.z ?? 0,   // height
+                -p.y        // flip Y → Z
+            );
+        });
+
+        this.geometry.setAttribute(
+            'position',
+            new THREE.Float32BufferAttribute(positions, 3)
+        );
+
+        this.geometry.computeBoundingSphere();
+    }
+
+    draw3D(renderer) {
+        if (!this.points) return;
+
+        // scale points in 2D so they stay visible
+        if (renderer.is2D) {
+            const s = Math.max(1, 8 / renderer.topDownCamera.zoom);
+            this.points.material.size = 0.2 * s;
+        } else {
+            this.points.material.size = 0.2;
+        }
+    }
+}
+
+
 // Fetch stops once on load and populate dropdowns
 function fetchStops(stopsLayer) {
     fetch(`http://localhost:${PORT}/stops`)
@@ -717,6 +764,7 @@ function main(){
     const stopsLayer = new StopsLayer();
     const routeLayer = new RouteLayer();
     const kinematicsLayer = new KinematicsLayer();
+    const pointCloudLayer = new PointCloudLayer();
 
     // add drawables ONCE
     renderer3d.add(lanelets);
@@ -724,6 +772,7 @@ function main(){
     renderer3d.add(stopsLayer);
     renderer3d.add(routeLayer);
     renderer3d.add(kinematicsLayer);
+    renderer3d.add(pointCloudLayer);
 
     // start in 2Dcamera
     renderer3d.toggle2D();  // start in top-down
@@ -766,10 +815,10 @@ function main(){
                     lanelets.build3D();
                     computeMapCenter(d.map);
                 }
-                if (!followRoute) {
-                    vehicle.setPose(d.vehicle);
-                }
+                vehicle.setPose(d.vehicle);
                 kinematicsLayer.setData(d.predicted_objects, d.tracked_objects);
+                
+                pointCloudLayer.setPoints(d.pointcloud);
             })
             .catch(() => {});
     }
