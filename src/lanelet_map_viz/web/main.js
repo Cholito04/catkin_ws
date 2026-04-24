@@ -5,7 +5,7 @@ import {STLLoader} from "three/addons/loaders/STLLoader.js"
 let routeWaypoints = [];
 let routeStartTime = null;
 let routeTotalTime = 0; //seconds
-const SPEED_MPS = 5; //meters/sec
+const SPEED_MPS = 10; //meters/sec
 let followRoute = true;
 let stopsData = null;
 
@@ -84,7 +84,8 @@ class Renderer3d {
             roads: new THREE.Group(),
             laneMarkings: new THREE.Group(),
             vehicles: new THREE.Group(),
-            debug: new THREE.Group()
+            debug: new THREE.Group(),
+            pointcloud: new THREE.Group()
         };
 
         this.controls.addEventListener('start', () => {
@@ -355,16 +356,9 @@ class VehicleEntity extends Drawable {
         super();
         this.pose = null;
         this.mesh = null;
-
-        //fake motion state
-        this.t = 0;
-        this.radius = 25;
-
-        this.angularSpeed = 0.4;
     }
 
     setPose(pose) {
-        if (pose) this.useRealPose = true;
         this.pose = pose;
     }
 
@@ -383,8 +377,13 @@ class VehicleEntity extends Drawable {
                 roughness: 0.5,
                 metalness: 0.3
             });
-            const mesh = new THREE.Mesh(geometry, material);
 
+            const color = 0xffffff
+
+            // sphere marker
+            const geo = new THREE.SphereGeometry(3, 10, 10);
+            const mat = new THREE.MeshBasicMaterial({ color });
+            const mesh = new THREE.Mesh(geo, mat);
                 // get raw model dimensions before any scaling
             const box = new THREE.Box3().setFromObject(mesh);
             const size = box.getSize(new THREE.Vector3());
@@ -409,30 +408,7 @@ class VehicleEntity extends Drawable {
         xhr => console.log(`Model: ${(xhr.loaded / xhr.total * 100).toFixed(1)}% loaded`),
         err => console.error("STL load error:", err)
         );
-    }
-
-    update(dt) {
-        if (this.useRealPose) return;
-
-        this.t += dt * this.angularSpeed;
-        const x = Math.cos(this.t) * this.radius;
-        const y = Math.sin(this.t) * this.radius;
-        const targetYaw = Math.atan2(
-            Math.cos(this.t),
-            -Math.sin(this.t)
-        );
-
-        if (this.pose) {
-            let dyaw = targetYaw - this.pose.yaw;
-            while (dyaw >  Math.PI) dyaw -= 2 * Math.PI;
-            while (dyaw < -Math.PI) dyaw += 2 * Math.PI;
-            const smoothYaw = this.pose.yaw + dyaw * 0.2;
-            this.pose = { x, y, yaw: smoothYaw };
-        } else {
-            this.pose = { x, y, yaw: targetYaw };
-        }
-    }
-
+    } 
     draw3D(renderer) {
         if (!this.vGroup || !this.pose) return;
         const { x, y, yaw } = this.pose;
@@ -499,6 +475,7 @@ class RouteLayer extends Drawable {
         super();
         this.waypoints = [];
         this.line3D = null;
+        this.vehiclePos = null;
     }
 
     onAdd(renderer) {
@@ -511,54 +488,67 @@ class RouteLayer extends Drawable {
         this.rebuild3D();
     }
 
-    rebuild3D() {
-        if (this.line3D) {
-            this.scene?.remove(this.line3D);
-            this.line3D.geometry.dispose();
-            this.line3D.material.dispose();
-            this.line3D = null;
-        }
-        if (this.waypoints.length < 2 || !this.scene) return;
+    setVehiclePosition(pos) {
+        this.vehiclePos = pos;
+        this.rebuild3D();
+    }
 
-        // build a ribbon mesh along the route instead of a line
-        const laneWidth = 3.5; // meters — adjust to match your lane width
+    findClosestIndex() {
+        if (!this.vehiclePos || this.waypoints.length === 0) return 0;
+
+        let bestIdx = 0;
+        let bestDist = Infinity;
+
+        for (let i = 0; i < this.waypoints.length; i++) {
+            const dx = this.waypoints[i][0] - this.vehiclePos.x;
+            const dy = this.waypoints[i][1] - this.vehiclePos.y;
+            const d = dx * dx + dy * dy;
+
+            if (d < bestDist) {
+                bestDist = d;
+                bestIdx = i;
+            }
+        }
+
+        return bestIdx;
+    }
+    
+    buildRibbon(points, color) {
+        if (points.length < 2) return null;
+
+        const laneWidth = 3;
         const positions = [];
         const indices = [];
 
-        for (let i = 0; i < this.waypoints.length; i++) {
-            const p = this.waypoints[i];
+        for (let i = 0; i < points.length; i++) {
+            const p = points[i];
 
-            // compute direction to next point (or from previous)
             let dx, dz;
-            if (i < this.waypoints.length - 1) {
-                const next = this.waypoints[i + 1];
+            if (i < points.length - 1) {
+                const next = points[i + 1];
                 dx = next[0] - p[0];
                 dz = -(next[1] - p[1]);
             } else {
-                const prev = this.waypoints[i - 1];
+                const prev = points[i - 1];
                 dx = p[0] - prev[0];
                 dz = -(p[1] - prev[1]);
             }
 
-            // normalize
             const len = Math.sqrt(dx * dx + dz * dz) || 1;
             dx /= len; dz /= len;
 
-            // perpendicular for lane width
             const px = -dz * laneWidth / 2;
             const pz =  dx * laneWidth / 2;
 
-            // left and right edge vertices
             positions.push(
-                p[0] + px, 0.05, -p[1] + pz,   // left
-                p[0] - px, 0.05, -p[1] - pz    // right
+                p[0] + px, 0.05, -p[1] + pz,
+                p[0] - px, 0.05, -p[1] - pz
             );
 
-            // build quad between this segment and the next
-            if (i < this.waypoints.length - 1) {
+            if (i < points.length - 1) {
                 const base = i * 2;
                 indices.push(
-                    base,     base + 1, base + 2,
+                    base, base + 1, base + 2,
                     base + 1, base + 3, base + 2
                 );
             }
@@ -570,14 +560,37 @@ class RouteLayer extends Drawable {
         geometry.computeVertexNormals();
 
         const material = new THREE.MeshBasicMaterial({
-            color: 0x00ffff,
+            color: color,
             transparent: true,
             opacity: 0.75,
             side: THREE.DoubleSide,
-            depthWrite: false  // prevents z-fighting with ground
+            depthWrite: false
         });
 
-        this.line3D = new THREE.Mesh(geometry, material);
+        return new THREE.Mesh(geometry, material);
+    }
+
+    rebuild3D() {
+        if (this.line3D) {
+            this.scene?.remove(this.line3D);
+            this.line3D = null;
+        }
+
+        if (this.waypoints.length < 2 || !this.scene) return;
+
+        const splitIdx = this.findClosestIndex();
+
+        const completed = this.waypoints.slice(0, splitIdx);
+        const remaining = this.waypoints.slice(splitIdx);
+
+        this.line3D = new THREE.Group();
+
+        const completedMesh = this.buildRibbon(completed, 0x00ff00); // green
+        const remainingMesh = this.buildRibbon(remaining, 0x00ffff); // cyan
+
+        if (completedMesh) this.line3D.add(completedMesh);
+        if (remainingMesh) this.line3D.add(remainingMesh);
+
         this.scene.add(this.line3D);
     }
 }
@@ -631,6 +644,77 @@ class KinematicsLayer extends Drawable {
         });
     }
 }
+
+class PointCloudLayer extends Drawable {
+    constructor() {
+        super();
+        this.points = null;
+        this.geometry = null;
+        this.material = null;
+        this.data = [];
+    }
+
+    onAdd(renderer) {
+        if (!(renderer instanceof Renderer3d)) return;
+
+        this.group = new THREE.Group();
+        renderer.layers.pointcloud.add(this.group);
+
+        this.geometry = new THREE.BufferGeometry();
+
+        this.material = new THREE.PointsMaterial({
+            size: 0.2,              // adjust density look
+            color: 0xcfa44a,        // gold to match your theme
+            sizeAttenuation: true,
+            transparent: true,
+            opacity: 0.8
+        });
+
+        this.points = new THREE.Points(this.geometry, this.material);
+        this.group.add(this.points);
+    }
+
+    setPoints(pointsArray) {
+        // pointsArray = [{x, y, z}, ...]
+        this.data = pointsArray || [];
+        this.updateGeometry();
+    }
+
+    updateGeometry() {
+        if (!this.geometry) return;
+
+        const positions = [];
+
+        this.data.forEach(p => {
+            // convert to your coordinate system
+            positions.push(
+                p.x,
+                p.z ?? 0,   // height
+                -p.y        // flip Y → Z
+            );
+        });
+
+        this.geometry.setAttribute(
+            'position',
+            new THREE.Float32BufferAttribute(positions, 3)
+        );
+
+        this.geometry.computeBoundingSphere();
+    }
+
+    draw3D(renderer) {
+        if (!this.points) return;
+
+        // scale points in 2D so they stay visible
+        if (renderer.is2D) {
+            const s = Math.max(1, 8 / renderer.topDownCamera.zoom);
+            this.points.material.size = 0.2 * s;
+        } else {
+            this.points.material.size = 0.2;
+        }
+    }
+}
+
 
 // Fetch stops once on load and populate dropdowns
 function fetchStops(stopsLayer) {
@@ -717,6 +801,7 @@ function main(){
     const stopsLayer = new StopsLayer();
     const routeLayer = new RouteLayer();
     const kinematicsLayer = new KinematicsLayer();
+    const pointCloudLayer = new PointCloudLayer();
 
     // add drawables ONCE
     renderer3d.add(lanelets);
@@ -724,6 +809,7 @@ function main(){
     renderer3d.add(stopsLayer);
     renderer3d.add(routeLayer);
     renderer3d.add(kinematicsLayer);
+    renderer3d.add(pointCloudLayer);
 
     // start in 2Dcamera
     renderer3d.toggle2D();  // start in top-down
@@ -766,10 +852,10 @@ function main(){
                     lanelets.build3D();
                     computeMapCenter(d.map);
                 }
-                if (!followRoute) {
-                    vehicle.setPose(d.vehicle);
-                }
+                vehicle.setPose(d.vehicle);
                 kinematicsLayer.setData(d.predicted_objects, d.tracked_objects);
+                
+                pointCloudLayer.setPoints(d.pointcloud);
             })
             .catch(() => {});
     }
