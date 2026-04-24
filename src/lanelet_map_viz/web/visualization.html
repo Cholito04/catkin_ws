@@ -3,61 +3,195 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title> Lanelet Map Viewer</title>
+    <title>WMU Autonomous Shuttle</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@300;400;500&display=swap" rel="stylesheet">
     <style>
-        html, body { 
-            margin: 0;
-            padding: 0;
-            background-color: #222;
-            color: white;
-            font-family: Arial, sans-serif;
-            display: flex;
-            flex-direction: column;
-            height: 100vh;
-            overflow: hidden;
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+        :root {
+            --bg: #1c140c;                /* dark brown */
+            --surface: #2a1f14;           /* panel brown */
+            --border: rgba(255,255,255,0.08);
+            --text: #f5e6c8;              /* soft gold text */
+            --text-muted: #cbb892;
+            --accent: #cfa44a;            /* WMU gold */
+            --accent-soft: rgba(207,164,74,0.2);
+            --mono: 'IBM Plex Mono', monospace;
+            --sans: 'IBM Plex Sans', sans-serif;
         }
-        canvas {
-            display: block;
-        } 
-        #logo {
+
+        html, body {
+            width: 100%; height: 100%;
+            overflow: hidden;
+            background: var(--bg);
+            color: var(--text);
+            font-family: var(--sans);
+        }
+
+        #three-container {
             position: absolute;
-            top: 10px;
-            left: 10px;
-            z-index: 10;
+            inset: 0;
+        }
+
+        /* ── top bar ── */
+        #topbar {
+            position: absolute;
+            top: 0; left: 0; right: 0;
+            height: 48px;
+            background: var(--surface);
+            border-bottom: 1px solid var(--border);
             display: flex;
             align-items: center;
-            background: rgba(0,0,0,0.5);
-            padding: 5px;
-            border-radius: 5px;
+            padding: 0 16px;
+            gap: 12px;
+            z-index: 30;
         }
-        
-        #logo img {
-            height: 50px;
+
+        #topbar .brand {
+            font-family: var(--mono);
+            font-size: 14px;
+            color: var(--accent);
+            letter-spacing: 0.05em;
         }
-        
-        #title {
+
+        #topbar .status-dot {
+            width: 8px; height: 8px;
+            border-radius: 50%;
+            background: var(--accent);
+        }
+
+        #topbar .status-label {
+            font-size: 11px;
+            color: var(--text-muted);
+        }
+
+        #topbar .spacer { flex: 1; }
+
+        #toggleView {
+            font-family: var(--mono);
+            font-size: 11px;
+            color: var(--text);
+            background: transparent;
+            border: 1px solid var(--accent);
+            border-radius: 4px;
+            padding: 6px 10px;
+            cursor: pointer;
+        }
+
+        #toggleView:hover {
+            background: var(--accent-soft);
+        }
+
+        /* ── right panel ── */
+        #right-panel {
             position: absolute;
-            top: 10px;
+            top: 60px;
+            right: 12px;
+            width: 200px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .panel-card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            overflow: hidden;
+        }
+
+        .panel-header {
+            padding: 8px 10px;
+            font-family: var(--mono);
+            font-size: 11px;
+            color: var(--text-muted);
+            border-bottom: 1px solid var(--border);
+        }
+
+        .panel-body { padding: 10px; }
+
+        .field {
+            margin-bottom: 8px;
+        }
+
+        .field label {
+            font-size: 10px;
+            color: var(--text-muted);
+            display: block;
+            margin-bottom: 3px;
+        }
+
+        .field select {
+            width: 100%;
+            background: #3a2a1a;
+            border: 1px solid var(--border);
+            color: var(--text);
+            font-size: 11px;
+            padding: 5px;
+            border-radius: 4px;
+        }
+
+        /* button */
+        #computeRoute {
+            width: 100%;
+            background: var(--accent);
+            border: none;
+            color: #1c140c;
+            font-family: var(--mono);
+            font-size: 11px;
+            padding: 7px;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        #computeRoute:hover {
+            opacity: 0.9;
+        }
+
+        /* ── legend ── */
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            margin-bottom: 6px;
+            font-size: 11px;
+            color: var(--text-muted);
+        }
+
+        .legend-dot {
+            width: 8px; height: 8px;
+            border-radius: 50%;
+        }
+
+        .legend-line {
+            width: 16px; height: 2px;
+        }
+
+        .legend-road {
+            width: 16px; height: 8px;
+        }
+
+        /* ── bottom hint ── */
+        #controls-hint {
+            position: absolute;
+            bottom: 10px;
             left: 50%;
             transform: translateX(-50%);
-            font-size: 24px;
-            font-weight: bold;
-            z-index: 10;
-            background: rgba(0,0,0,0.5);
-            padding: 5px 15px;
-            border-radius: 5px;
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 5px 12px;
+            font-size: 10px;
+            color: var(--text-muted);
         }
 
-        #map, #three-container {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100vw;
-            height: 100vh;
-            display: block; 
+        #controls-hint kbd {
+            background: #3a2a1a;
+            border-radius: 3px;
+            padding: 1px 4px;
         }
     </style>
-
 
     <script type="importmap">
     {
@@ -67,60 +201,111 @@
         }
     }
     </script>
-    
-    <script>   
+    <script>
         const PORT = ${PORT};
     </script>
 </head>
 <body>
-    <button id="toggleView" style="position:absolute; top:10px; left:10px; z-index:20;">
-        Switch to 3D
-    </button>
+
     <div id="three-container"></div>
 
-    <div id="stop-controls" style="position:absolute; top:50px; right:10px;
-        background:rgba(0,0,0,0.7); padding:12px; border-radius:8px; color:#fff; z-index:10;">
-        <div id="stopCount" style="font-size:10px; color:#aaa; margin-bottom:6px;">Stops: loading...</div>
-        <label>Start</label><br>
-        <select id="startSelect" style="width:160px; margin-bottom:8px;"></select><br>
-        <label>Goal</label><br>
-        <select id="goalSelect" style="width:160px; margin-bottom:8px;"></select><br>
-        <button id="computeRoute" style="width:160px;">Compute Route</button>
-    </div>
-
-
-    <script type="module" src="/main.js"></script>
-    <div id="controls-hint" style="
-        position: absolute;
-        bottom: 16px;
-        left: 50%;
-        transform: translateX(-50%);
-        background: rgba(0,0,0,0.6);
-        color: #ccc;
-        font-size: 12px;
-        padding: 8px 16px;
-        border-radius: 8px;
-        z-index: 20;
-        text-align: center;
-        pointer-events: none;
-        white-space: nowrap;
-    ">
-        <span id="controls-2d">Drag to pan | Scroll to zoom | F: re-center</span>
-        <span id="controls-3d" style="display:none;">Left drag to orbit | Right drag to pan | Scroll to zoom | F: re-follow</span>
+    <!-- top bar -->
+    <div id="topbar">
+        <span class="brand">WMU // SHUTTLE VIZ</span>
+        <div class="divider"></div>
+        <div class="status-dot"></div>
+        <span class="status-label">LIVE</span>
+        <div class="spacer"></div>
+        <button id="toggleView">Top Down View</button>
     </div>
 
     <div id="route-timer" style="
         position:absolute;
-        top:50px;
-        left:10px;
-        background:rgba(0,0,0,0.7);
-        padding:12px;
-        border-radius:8px;
-        color:#fff;
-        z-index:10;
-        font-size:18px;
+        top:60px;   /* below topbar */
+        left:12px;
+        background: var(--surface);
+        border: 1px solid var(--border);
+        padding:10px 14px;
+        border-radius:6px;
+        color: var(--text);
+        z-index:25;
+        font-family: var(--mono);
+        font-size:14px;
     ">
         Time Remaining: <span id="timeRemaining">--:--</span>
     </div>
+
+    <!-- right panel -->
+    <div id="right-panel">
+
+        <!-- route planner -->
+        <div class="panel-card">
+            <div class="panel-header">Route planner</div>
+            <div class="panel-body">
+                <div id="stopCount">Stops: loading...</div>
+                <div class="field">
+                    <label>Start</label>
+                    <select id="startSelect"></select>
+                </div>
+                <div class="field">
+                    <label>Goal</label>
+                    <select id="goalSelect"></select>
+                </div>
+                <button id="computeRoute">Compute route →</button>
+            </div>
+        </div>
+
+        <!-- legend -->
+        <div class="panel-card">
+            <div class="panel-header">Legend</div>
+            <div class="panel-body">
+                <div class="legend-item">
+                    <div class="legend-road" style="background:#444444;"></div>
+                    Road surface
+                </div>
+                <div class="legend-item">
+                    <div class="legend-line" style="background:#ffffff; opacity:0.5;"></div>
+                    Lane boundary
+                </div>
+                <div class="legend-item">
+                    <div class="legend-line" style="background:#00ffff; opacity:0.75;"></div>
+                    Planned route
+                </div>
+                <div class="legend-item">
+                    <div class="legend-dot" style="background:#00ff00;"></div>
+                    Start stop
+                </div>
+                <div class="legend-item">
+                    <div class="legend-dot" style="background:#ef4444;"></div>
+                    Goal stop
+                </div>
+                <div class="legend-item">
+                    <div class="legend-dot" style="background:#ffaa00;"></div>
+                    Bus stop
+                </div>
+                <div class="legend-item">
+                    <div class="legend-dot" style="background:#4444ff;"></div>
+                    Shuttle
+                </div>
+                <div class="legend-item">
+                    <div class="legend-dot" style="background:#ff0000;"></div>
+                    Tracked object
+                </div>
+                <div class="legend-item">
+                    <div class="legend-dot" style="background:#0000ff; opacity:0.6;"></div>
+                    Predicted position
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- controls hint -->
+    <div id="controls-hint">
+        <span id="controls-2d">Drag to pan &nbsp;·&nbsp; Scroll to zoom &nbsp;·&nbsp; <kbd>F</kbd> re-center</span>
+        <span id="controls-3d" style="display:none;">Left drag to orbit &nbsp;·&nbsp; Right drag to pan &nbsp;·&nbsp; Scroll to zoom &nbsp;·&nbsp; <kbd>F</kbd> re-follow</span>
+    </div>
+
+    <script type="module" src="/main.js"></script>
 </body>
 </html>
