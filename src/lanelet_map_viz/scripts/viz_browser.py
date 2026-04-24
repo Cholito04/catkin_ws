@@ -5,6 +5,7 @@ import rospy
 import json
 import threading
 import socket
+import open3d as o3d
 
 from http.server import HTTPServer, SimpleHTTPRequestHandler
 from socketserver import TCPServer
@@ -29,6 +30,7 @@ data_lock = threading.Lock()
 stops_data = {}
 predicted_objects = []
 tracked_objects = []
+pcd_data = None
 
 STOPS = {
     "Bus Loop": [42.284244, -85.617362],
@@ -53,8 +55,11 @@ STOPS = {
 
 ORIGIN_LAT  = 41.54938912945
 ORIGIN_LON  = -85.79313557283
-ORIGIN_LOCAL_X = 13620.5907   # from the osm file node id=2
-ORIGIN_LOCAL_Y = 81570.5428
+ORIGIN_LOCAL_X = 13620.5907 + 50   # from the osm file node id=2
+ORIGIN_LOCAL_Y = 81570.5428 + 900  
+
+
+
 def build_stops(llmap, projector):
     stops = {}
     # get UTM of origin once
@@ -67,12 +72,12 @@ def build_stops(llmap, projector):
         x = (px_utm - ox_utm) - ORIGIN_LOCAL_X
         y = (py_utm - oy_utm) - ORIGIN_LOCAL_Y
 
-        lanelet_id, centerline_point = find_nearest_lanelet(x, y, llmap)
+        candidates = find_k_nearest_lanelets(x, y, llmap, k=3)
+
         stops[name] = {
             "display_name": name,
             "x": x, "y": y,
-            "lanelet_id": lanelet_id,
-            "centerline_point": centerline_point
+            "lanelet_candidates": candidates
         }
     return stops
 
@@ -91,7 +96,8 @@ class DataHandler(SimpleHTTPRequestHandler):
                     'map': map_data,
                     'vehicle': vehicle_pose,
                     'predicted_objects': predicted_objects,
-                    'tracked_objects': tracked_objects
+                    'tracked_objects': tracked_objects,
+                    'pointcloud': pcd_data 
                 }
 
             self.send_response(200)
@@ -114,23 +120,63 @@ class DataHandler(SimpleHTTPRequestHandler):
             start_stop = stops_data[body["start"]]
             goal_stop  = stops_data[body["goal"]]
 
-            start_ll = get_lanelet_by_id(llmap_global, start_stop["lanelet_id"])
-            goal_ll  = get_lanelet_by_id(llmap_global, goal_stop["lanelet_id"])
+            best_route = None
+            best_length = float('inf')
 
-            route_pts = None
-            if start_ll is not None and goal_ll is not None:
-                route_pts = compute_centerline_route_points(start_ll, goal_ll)
+            start_candidates = start_stop["lanelet_candidates"]
+            goal_candidates  = goal_stop["lanelet_candidates"]
 
-            if not route_pts:
-                route_pts = [start_stop["centerline_point"], goal_stop["centerline_point"]]
+            for sid, _ in start_candidates:
+                for gid, _ in goal_candidates:
+                    start_ll = get_lanelet_by_id(llmap_global, sid)
+                    goal_ll  = get_lanelet_by_id(llmap_global, gid)
 
+                    route = compute_centerline_route_points(start_ll, goal_ll)
+
+                    if route:
+                        length = sum(
+                            math.hypot(route[i][0] - route[i-1][0],
+                                    route[i][1] - route[i-1][1])
+                            for i in range(1, len(route))
+                        )
+
+                        if length < best_length:
+                            best_length = length
+                            best_route = route
+
+            route_pts = best_route
             # prepend current vehicle position so route starts from the van
             with data_lock:
                 current_pose = vehicle_pose
 
             if current_pose:
-                route_pts = [[current_pose["x"], current_pose["y"]]] + route_pts
+                vx, vy = current_pose["x"], current_pose["y"]
 
+                vehicle_candidates = find_k_nearest_lanelets(vx, vy, llmap_global, k=3)
+
+                best_vehicle_route = None
+                best_len = float('inf')
+
+                for vid, _ in vehicle_candidates:
+                    for gid, _ in goal_stop["lanelet_candidates"]:
+                        start_ll = get_lanelet_by_id(llmap_global, vid)
+                        goal_ll  = get_lanelet_by_id(llmap_global, gid)
+
+                        route = compute_centerline_route_points(start_ll, goal_ll)
+
+                        if route:
+                            length = sum(
+                                math.hypot(route[i][0] - route[i-1][0],
+                                        route[i][1] - route[i-1][1])
+                                for i in range(1, len(route))
+                            )
+
+                            if length < best_len:
+                                best_len = length
+                                best_vehicle_route = route
+
+                if best_vehicle_route:
+                    route_pts = best_vehicle_route
             self.send_response(200)
             self.send_header('Content-Type', 'application/json')
             self.end_headers()
@@ -149,8 +195,8 @@ def pose_callback(msg):
     global vehicle_pose
     with data_lock:
         vehicle_pose = {
-            "x": msg.x - ORIGIN_LOCAL_X,
-            "y": msg.y - ORIGIN_LOCAL_Y,
+            "x": msg.x,
+            "y": msg.y,
             "yaw": msg.theta
         }
 
@@ -182,6 +228,12 @@ def tracked_callback(msg):
             }
             for m in msg.markers
         ]
+        
+ #point cloud data
+def load_pcd_file(pcd_path):
+    pcd = o3d.io.read_point_cloud(pcd_path)
+    points = list(map(lambda p: [p[0], p[1], p[2]], pcd.points))
+    return points
 
 
 def load_lanelet_map(map_path):
@@ -273,6 +325,30 @@ def compute_centerline_route_points(start_lanelet, goal_lanelet):
             filtered.append(xy)
 
     return filtered if len(filtered) >= 2 else None
+
+
+def find_k_nearest_lanelets(x, y, llmap, k=3):
+    candidates = []
+
+    for ll in llmap.laneletLayer:
+        for p in ll.centerline:
+            dist = (p.x - x)**2 + (p.y - y)**2
+            candidates.append((dist, ll, [p.x, p.y]))
+
+    candidates.sort(key=lambda c: c[0])
+
+    # return top k unique lanelets
+    result = []
+    seen_ids = set()
+
+    for _, ll, pt in candidates:
+        if ll.id not in seen_ids:
+            result.append((ll.id, pt))
+            seen_ids.add(ll.id)
+        if len(result) >= k:
+            break
+
+    return result
 
 def create_html_file(port):
     html_path = os.path.join(os.path.dirname(__file__), "../web/visualization.html")
@@ -419,7 +495,13 @@ def main():
     if not os.path.exists(map_path):
         rospy.logerr("Map file not found")
         return 
-    
+    pcd_path = rospy.get_param("~pcd_file", "")
+
+    if pcd_path and os.path.exists(pcd_path):
+        rospy.loginfo("Loading PCD file...")
+        global pcd_data
+        pcd_data = load_pcd_file(pcd_path)
+
     # initalize Ros node 
     rospy.loginfo("Initializing visualization node...")
     
